@@ -35,7 +35,7 @@ Define a concrete communication scheme between objects.
 * ### State
    Allows an object to alter its behavior when its internal state changes.
 
-   > Unity has this pattern already built-in in its [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html). 
+   > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html). 
    ```csharp
     [RequiredByNativeCode]
     public abstract class StateMachineBehaviour : ScriptableObject
@@ -65,7 +65,7 @@ Define a concrete communication scheme between objects.
     }
    ```
    ```csharp
-   public class NewStateMachineBehaviour : StateMachineBehaviour
+   public class ExampleClass : StateMachineBehaviour
    {
        // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
        override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -114,13 +114,13 @@ Define a concrete communication scheme between objects.
 
          void Exit(EnemyState* state)
          {
-            enemy->current_state->OnStateExit();
-            enemy->current_state = state;
-            enemy->current_state->OnStateEnter();
+            _enemy->CurrentState->OnStateExit();
+            _enemy->CurrentState = state;
+            _enemy->CurrentState->OnStateEnter();
          }
 
       protected:
-         T* const enemy = nullptr;
+         T* const _enemy = nullptr;
    };
    ```
    ```cpp
@@ -129,22 +129,22 @@ Define a concrete communication scheme between objects.
       public:
          Mushdoom()
          {
-            current_state = new MushdoomState();
-            idle_state = new MushdoomStateIdle(this);
-            attack_state = new MushdoomStateAttack(this);
+            CurrentState = new MushdoomState();
+            IdleState = new MushdoomStateIdle(this);
+            AttackState = new MushdoomStateAttack(this);
          }
          ~Mushdoom();
 
          void Update()
          {
-            _currentState->OnStateUpdate();
+            CurrentState->OnStateUpdate();
          }
 
       public:
          typedef EnemyState<Mushdoom> MushdoomState;
-         MushdoomState* current_state = nullptr;
-         MushdoomState* idle_state = nullptr;
-         MushdoomState* attack_state = nullptr;
+         MushdoomState* CurrentState = nullptr;
+         MushdoomState* IdleState = nullptr;
+         MushdoomState* AttackState = nullptr;
    };
    ```
    ```cpp
@@ -200,25 +200,157 @@ Create objects, rather than instantiating them directly.
    ```csharp
    public class ExampleClass : MonoBehaviour
    {
-       public Transform prefab;
+       [SerializeField]
+       private Transform _prefab;
        
        private void Start()
        {
            // Instantiates 10 copies of Prefab each 2 units apart from each other
            for (int i = 0; i < 10; ++i)
            {
-               Instantiate(prefab, new Vector3(i * 2.0F, 0, 0), Quaternion.identity);
+               Instantiate(_prefab, new Vector3(i * 2.0F, 0, 0), Quaternion.identity);
            }
        }
    }
    ```
 * ### Singleton
    Restricts object creation for a class to only one instance.
+   
+   > This is a [project killer pattern](https://cocoacasts.com/are-singletons-bad)! It's the prohibited pattern which shall never be named (except in game jams). Instead of using singletons, program to an interface (not to an implementation) and if you use a DI framework to fill these dependencies even better. I highly recommend using [Zenject](https://assetstore.unity.com/packages/tools/utilities/extenject-dependency-injection-ioc-157735). Dependency Inversion Principle > Singleton.
+   ```csharp
+    public class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour
+    {
+        private static bool _shuttingDown = false;
+        private static readonly object _lock = new object();
+        private static T _instance;
+
+        public static T Instance
+        {
+            get
+            {
+                if (_shuttingDown)
+                {
+                    Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
+                    return null;
+                }
+
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = (T)FindObjectOfType(typeof(T));
+
+                        if (_instance == null)
+                        {
+                            var singletonObject = new GameObject();
+                            _instance = singletonObject.AddComponent<T>();
+                            singletonObject.name = $"{typeof(T)} (Singleton)";
+                            DontDestroyOnLoad(singletonObject);
+                        }
+                    }
+
+                    return _instance;
+                }
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            _shuttingDown = true;
+        }
+
+        private void OnDestroy()
+        {
+            _shuttingDown = true;
+        }
+    }
+   ```
+   ```csharp
+    public sealed class UIManager : MonoBehaviourSingleton<UIManager>
+    {
+        [SerializeField]
+        private BasePanel[] _uiPanels;
+
+        private Dictionary<Type, BasePanel> _panelLibrary;
+
+        private void Awake()
+        {
+            _panelLibrary = new Dictionary<Type, BasePanel>();
+            foreach (var panel in _uiPanels)
+            {
+                _panelLibrary.Add(panel.GetType(), panel);
+            }
+        }
+
+        public void ShowPanel<T>() where T : BasePanel
+        {
+            if (_panelLibrary.ContainsKey(typeof(T)))
+            {
+               _panelLibrary[typeof(T)].ShowPanel();
+            }
+            else 
+            {
+               Debug.LogWarning($"Panel to show '{typeof(T)}' was not found!");
+            }
+        }
+
+        public void HidePanel<T>() where T : BasePanel
+        {
+            if (_panelLibrary.ContainsKey(typeof(T)))
+            {
+               _panelLibrary[typeof(T)].HidePanel();
+            }
+            else 
+            {
+               Debug.LogWarning($"Panel to hide '{typeof(T)}' was not found!");
+            }
+        }
+    }
+   ```
+   ```csharp
+    public class ControlsMenuPanel : BasePanel
+    {
+        [SerializeField]
+        private Button _goBackButton;
+
+        private void Start()
+        {
+            FirstSelectedButton = _goBackButton;
+            _goBackButton.onClick.AddListener(ShowOptionsMenu);
+        }
+
+        private void ShowOptionsMenu()
+        {
+             UIManager.Instance.HidePanel<MainMenuPanel>();
+             UIManager.Instance.ShowPanel<OptionsMenuPanel>();
+        }
+    }
+   ```
 
 ## ✂️ Decoupling Patterns
 Split dependencies to ensure that changing a piece of code doesn't require changing another one.
 * ### Component
    Allows a single entity to span multiple domains without coupling the domains to each other.
+   
+   > Unity has this pattern already built-in in its own [Component System](https://docs.unity3d.com/ScriptReference/Component.html).
+   ```csharp
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(AudioSource))]
+    [RequireComponent(typeof(Rigidbody2D))]
+    public abstract class Creature : MonoBehaviour, IEntity
+    {
+        protected Animator _animator;
+        protected AudioSource _audioSource;
+        protected Rigidbody2D _rigidbody2D;
+
+        protected virtual void Start()
+        {
+            _animator = GetComponent<Animator>();
+            _audioSource = GetComponent<AudioSource>();
+            _rigidbody2D = GetComponent<Rigidbody2D>();
+        }
+    }
+   ```
 * ### Event Queue
    Decouples when an event is sent and when it is executed.
 * ### Service Locator
@@ -234,15 +366,19 @@ Speed up the game by pushing the hardware to the furthest.
    Allows the recycling of objects and optimizes performance and memory.
 * ### Spatial Partition
    Locates objects efficiently by storing them in a data structure organized by their positions.
+   
+   > Unity has this pattern already built-in in its own [Frustum Culling System](https://forum.unity.com/threads/frustum-culling.2752/). It uses an octree for culling objects.
 
 ## ⏰ Sequencing Patterns
 Invent time and craft the gears that drive the game's great clock.
 * ### Double Buffer
    Causes a series of sequential operations to appear instantaneous or simultaneous.
+   
+   > Unity has this pattern already built-in in its own [Rendering System](https://answers.unity.com/questions/203931/double-buffering.html). It uses 2 or even more buffers by native implementation.
 * ### Game Loop
    Decouples the progression of game time from user input and processor speed.
    
-   > Unity has this pattern already built-in in its own [internal system](https://docs.unity3d.com/Manual/ExecutionOrder.html).
+   > Unity has this pattern already built-in in its own [Execution System](https://docs.unity3d.com/Manual/ExecutionOrder.html).
    
    > Here are some C++ implementations I made in the past.
    ```cpp
