@@ -34,7 +34,9 @@ Define a concrete communication scheme between objects.
    It's a publish/subscribe pattern, which allows  a number of observer objects to see an event.
 * ### State
    Allows an object to alter its behavior when its internal state changes.
-
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/State.png)
+   
    > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html). 
    ```csharp
     [RequiredByNativeCode]
