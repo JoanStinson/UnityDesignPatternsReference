@@ -1,0 +1,6 @@
+Noon waveform guide
+
+Square wave 1 - Melody
+Square wave 2 - Bass
+Triangle wave - Drum
+Noise channel - Percussion

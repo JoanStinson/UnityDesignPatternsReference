@@ -1,0 +1,6 @@
+Gridlock waveform guide
+
+Square wave 1 - M-Melody
+Square wave 2 - C-Melody
+Triangle wave - Kicker
+Noise channel - Percussion

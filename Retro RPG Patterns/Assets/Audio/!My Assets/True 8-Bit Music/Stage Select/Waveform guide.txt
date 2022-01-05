@@ -1,0 +1,5 @@
+Stage Select waveform guide
+
+Square wave 1 - Melody
+Triangle wave - Kicker
+Noise channel - Percussion

@@ -1,0 +1,6 @@
+Winter waveform guide
+
+Square wave 1 - Melody_M
+Square wave 2 - Melody_C
+Triangle wave - Bass
+Noise channel - Percussion
