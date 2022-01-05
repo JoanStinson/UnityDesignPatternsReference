@@ -600,17 +600,29 @@ Invent time and craft the gears that drive the game's great clock.
 Use inheritance to compose interfaces and define ways to compose objects to obtain new functionality.
 * ### Adapter
    Allows classes with incompatible interfaces to work together by wrapping its own interface around that of an already existing class.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Adapter.png)
 * ### Bridge
    Decouples an abstraction from its implementation so that the two can vary independently.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Bridge.png)
 * ### Composite
    Composes zero-or-more similar objects so that they can be manipulated as one object.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Composite.png)
 * ### Decorator
    Dynamically adds/overrides behavior in an existing method of an object.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Decorator.png)
 * ### Facade
    Provides a simplified interface to a large body of code.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Facade.png)
 * ### Flyweight
    Reduces the cost of creating and manipulating a large number of similar objects.
    
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Flyweight.png)
+      
    > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html) by referencing the data of 1 prefab to instantiate multiple objects that are similar reducing memory usage and the same goes for the [Scriptable Objects System](https://docs.unity3d.com/Manual/class-ScriptableObject.html) as if multiple prefabs reference the same scriptable object, only 1 scriptable object reference will be used for all prefabs (less copies equals less memory).
 * ### Proxy
    Provides a placeholder for another object to control access, reduce cost, and reduce complexity.
