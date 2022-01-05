@@ -213,12 +213,20 @@ Define a concrete communication scheme between objects.
 Create objects, rather than instantiating them directly.
 * ### Abstract Factory
    Groups object factories that have a common theme.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Abstract%20Factory.png)
 * ### Builder
    Constructs complex objects by separating construction and representation.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Builder.png)
 * ### Factory Method
    Creates objects without specifying the exact class to create.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Factory%20Method.png)
 * ### Prototype
    Creates objects by cloning an existing object.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Prototype.png)
    
    > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html). When using the [GameObject.Instantiate](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html) method it clones the original object (a prefab) and returns a clone (which is spawned in the current scene with the '(Clone)' suffix).
    ```csharp
@@ -240,6 +248,8 @@ Create objects, rather than instantiating them directly.
 * ### Singleton
    Restricts object creation for a class to only one instance.
    
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Singleton.png)
+      
    > This is a [project killer pattern](https://cocoacasts.com/are-singletons-bad)! It's the prohibited pattern which shall never be named (except in game jams). Instead of using singletons, program to an interface (not to an implementation) and if you use a DI framework to fill these dependencies even better. I highly recommend using [Zenject](https://assetstore.unity.com/packages/tools/utilities/extenject-dependency-injection-ioc-157735). Dependency Inversion Principle > Singleton.
    ```csharp
     public class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour
