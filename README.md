@@ -18,20 +18,36 @@ A tiny retro action RPG implementation made applying Software Design Patterns to
 Define a concrete communication scheme between objects.
 * ### Bytecode
    Give a behavior the flexibility of data by encoding it as instructions for a virtual machine.
+   
+   > Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/). 
 * ### Chain of Responsibility
    Delegates commands to a chain of processing objects.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Chain%20of%20Responsibility.png)
 * ### Command
    Creates objects that encapsulate actions and parameters.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Command.png)
 * ### Interpreter
    Implements a specialized language.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Interpreter.png)
 * ### Iterator
    Accesses the elements of an object sequentially without exposing its underlying representation.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Iterator.png)
 * ### Mediator
    Allows loose coupling between classes by being the only class that has detailed knowledge of their methods.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Mediator.png)
 * ### Memento
    Provides the ability to restore an object to its previous state (undo).
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Memento.png)
 * ### Observer
    It's a publish/subscribe pattern, which allows  a number of observer objects to see an event.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Observer.png)
 * ### State
    Allows an object to alter its behavior when its internal state changes.
    
@@ -178,14 +194,20 @@ Define a concrete communication scheme between objects.
    
 * ### Strategy
    Allows one of a family of algorithms to be selected on-the-fly at runtime.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Strategy.png)
 * ### Subclass Sandbox
    Defines the behavior in a subclass using a set of operations provided by its base class.
 * ### Template Method
    Defines the skeleton of an algorithm as an abstract class, allowing its subclasses to provide concrete behavior.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Template%20Method.png)
 * ### Type Object
    Allows a flexible creation of new “classes” by creating a single class, each instance of which represents a different type of object.
 * ### Visitor
    Separates an algorithm from an object structure by moving the hierarchy of methods into one object.
+   
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Visitor.png)
 
 ## 🐣 Creational Patterns
 Create objects, rather than instantiating them directly.
