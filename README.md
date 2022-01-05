@@ -196,7 +196,7 @@ Create objects, rather than instantiating them directly.
 * ### Prototype
    Creates objects by cloning an existing object.
    
-   > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html). When using the [Object.Instantiate](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html) method it clones the original object (a prefab) and returns a clone (which is spawned in the current scene with the '(Clone)' suffix).
+   > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html). When using the [GameObject.Instantiate](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html) method it clones the original object (a prefab) and returns a clone (which is spawned in the current scene with the '(Clone)' suffix).
    ```csharp
    public class ExampleClass : MonoBehaviour
    {
@@ -577,6 +577,6 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
 * ### Flyweight
    Reduces the cost of creating and manipulating a large number of similar objects.
    
-   > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html) by referencing the data of 1 prefab to instantiate multiple objects that are similar reducing memory usage and the same goes for the [Scriptable Objects System](https://docs.unity3d.com/Manual/class-ScriptableObject.html) as if multiple prefabs referene the same scriptable object, only 1 scriptable object reference will be used for all prefabs (less copies equals less memory).
+   > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html) by referencing the data of 1 prefab to instantiate multiple objects that are similar reducing memory usage and the same goes for the [Scriptable Objects System](https://docs.unity3d.com/Manual/class-ScriptableObject.html) as if multiple prefabs reference the same scriptable object, only 1 scriptable object reference will be used for all prefabs (less copies equals less memory).
 * ### Proxy
    Provides a placeholder for another object to control access, reduce cost, and reduce complexity.
