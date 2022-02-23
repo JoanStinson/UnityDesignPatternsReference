@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace JGM.Game
+namespace JGM.Game.Singleton
 {
     public class GameManager : Singleton<GameManager>
     {

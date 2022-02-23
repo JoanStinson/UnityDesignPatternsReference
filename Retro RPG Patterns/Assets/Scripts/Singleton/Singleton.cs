@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace JGM.Game
+namespace JGM.Game.Singleton
 {
     public class Singleton<T> : MonoBehaviour where T : Component
     {
