@@ -1,7 +1,7 @@
 ﻿using UnityEngine.Events;
 using System.Collections.Generic;
 
-namespace JGM.Game.EventBus
+namespace JGM.Patterns.EventBus
 {
     public class RaceEventBus
     {

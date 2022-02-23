@@ -1,4 +1,4 @@
-﻿namespace JGM.Game.EventBus
+﻿namespace JGM.Patterns.EventBus
 {
     public interface IRaceEventSubscriber 
     {

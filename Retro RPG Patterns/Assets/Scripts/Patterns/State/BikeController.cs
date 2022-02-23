@@ -1,7 +1,7 @@
-﻿using JGM.Game.State.States;
+﻿using JGM.Patterns.State.States;
 using UnityEngine;
 
-namespace JGM.Game.State
+namespace JGM.Patterns.State
 {
     public class BikeController : MonoBehaviour
     {

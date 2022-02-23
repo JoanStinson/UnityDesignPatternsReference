@@ -1,4 +1,4 @@
-﻿namespace JGM.Game.State
+﻿namespace JGM.Patterns.State
 {
     public enum Direction
     {

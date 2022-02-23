@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace JGM.Game.EventBus
+namespace JGM.Patterns.EventBus
 {
     public class CountdownTimer : MonoBehaviour, IRaceEventSubscriber
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JGM.Game.EventBus
+namespace JGM.Patterns.EventBus
 {
     public class BikeController : MonoBehaviour, IRaceEventSubscriber
     {

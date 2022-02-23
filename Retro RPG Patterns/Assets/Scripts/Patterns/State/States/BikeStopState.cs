@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JGM.Game.State.States
+namespace JGM.Patterns.State.States
 {
     public class BikeStopState : MonoBehaviour, IBikeState
     {

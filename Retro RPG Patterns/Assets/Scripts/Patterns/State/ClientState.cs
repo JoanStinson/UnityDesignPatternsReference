@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JGM.Game.State
+namespace JGM.Patterns.State
 {
     [RequireComponent(typeof(BikeController))]
     public class ClientState : MonoBehaviour
