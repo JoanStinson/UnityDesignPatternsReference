@@ -32,6 +32,8 @@ Define a concrete communication scheme between objects.
    Implements a specialized language.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Interpreter.png)
+   
+   > Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/).
 * ### Iterator
    Accesses the elements of an object sequentially without exposing its underlying representation.
    
@@ -53,7 +55,7 @@ Define a concrete communication scheme between objects.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/State.png)
    
-   > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html). 
+   > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html) (also known as 'Mecanim'). 
    ```csharp
     [RequiredByNativeCode]
     public abstract class StateMachineBehaviour : ScriptableObject
@@ -62,136 +64,37 @@ Define a concrete communication scheme between objects.
 
         public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash);
         public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
+        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash);
+        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
         
         public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
         public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        
         public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
         public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        
         public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
         public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
         
         public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
         public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        
         public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
         public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-
-        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash);
-        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
     }
    ```
    ```csharp
-   public class ExampleClass : StateMachineBehaviour
+   public class EnemyIdle : StateMachineBehaviour
    {
-       // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-       override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+       public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
        {
-
+            animator.SetBool("canPursuePlayer", true);
        }
 
-       // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
        override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
        {
-
-       }
-
-       // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-       override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-       {
-
-       }
-
-       // OnStateMove is called right after Animator.OnAnimatorMove()
-       override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-       {
-           // Implement code that processes and affects root motion
-       }
-
-       // OnStateIK is called right after Animator.OnAnimatorIK()
-       override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-       {
-           // Implement code that sets up animation IK (inverse kinematics)
+            WanderRandomlyThroughMap();
+            LookAtPlayerAtRandomIntervals();
        }
    }
    ```
-   > Here is a C++ implementation I made in the past of a FSM using function pointer style.
-   ```cpp
-   template <typename T>
-   class EnemyState
-   {
-      public:
-         EnemyState() { }
-         EnemyState(T* enemy) : enemy(enemy) { }
-         virtual ~EnemyState() = default;
-
-         virtual void OnStateEnter() { }
-         virtual void OnStateUpdate() { }
-         virtual void OnStateExit() { }
-
-         void Exit(EnemyState* state)
-         {
-            _enemy->CurrentState->OnStateExit();
-            _enemy->CurrentState = state;
-            _enemy->CurrentState->OnStateEnter();
-         }
-
-      protected:
-         T* const _enemy = nullptr;
-   };
-   ```
-   ```cpp
-   class Mushdoom
-   {
-      public:
-         Mushdoom()
-         {
-            CurrentState = new MushdoomState();
-            IdleState = new MushdoomStateIdle(this);
-            AttackState = new MushdoomStateAttack(this);
-         }
-         ~Mushdoom();
-
-         void Update()
-         {
-            CurrentState->OnStateUpdate();
-         }
-
-      public:
-         typedef EnemyState<Mushdoom> MushdoomState;
-         MushdoomState* CurrentState = nullptr;
-         MushdoomState* IdleState = nullptr;
-         MushdoomState* AttackState = nullptr;
-   };
-   ```
-   ```cpp
-   class MushdoomStateIdle : public EnemyState<Mushdoom>
-   {
-      public:
-         MushdoomStateIdle(Mushdoom* enemy);
-         ~MushdoomStateIdle() = default;
-
-         // Have its own implementation
-         void OnStateEnter() override;
-         void OnStateUpdate() override;
-         void OnStateExit() override;
-   };
-   ```
-   ```cpp
-   class MushdoomStateAttack : public EnemyState<Mushdoom>
-   {
-      public:
-         MushdoomStateAttack(Mushdoom* enemy);
-         ~MushdoomStateAttack() = default;
-
-         // Have its own implementation
-         void OnStateEnter() override;
-         void OnStateUpdate() override;
-         void OnStateExit() override;
-   };
-   ```
-   
 * ### Strategy
    Allows one of a family of algorithms to be selected on-the-fly at runtime.
    
@@ -230,17 +133,16 @@ Create objects, rather than instantiating them directly.
    
    > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html). When using the [GameObject.Instantiate](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html) method it clones the original object (a prefab) and returns a clone (which is spawned in the current scene with the '(Clone)' suffix).
    ```csharp
-   public class ExampleClass : MonoBehaviour
+   public class PrefabInstantiater : MonoBehaviour
    {
        [SerializeField]
        private Transform _prefab;
        
        private void Start()
        {
-           // Instantiates 10 copies of Prefab each 2 units apart from each other
            for (int i = 0; i < 10; ++i)
            {
-               Instantiate(_prefab, new Vector3(i * 2.0F, 0, 0), Quaternion.identity);
+               Instantiate(_prefab, new Vector3(i * 2f, 0, 0), Quaternion.identity);
            }
        }
    }
@@ -302,57 +204,20 @@ Create objects, rather than instantiating them directly.
    ```csharp
     public sealed class UIManager : MonoBehaviourSingleton<UIManager>
     {
-        [SerializeField]
-        private BasePanel[] _uiPanels;
-
-        private Dictionary<Type, BasePanel> _panelLibrary;
-
-        private void Awake()
-        {
-            _panelLibrary = new Dictionary<Type, BasePanel>();
-            foreach (var panel in _uiPanels)
-            {
-                _panelLibrary.Add(panel.GetType(), panel);
-            }
-        }
-
         public void ShowPanel<T>() where T : BasePanel
         {
-            if (_panelLibrary.ContainsKey(typeof(T)))
-            {
-               _panelLibrary[typeof(T)].ShowPanel();
-            }
-            else 
-            {
-               Debug.LogWarning($"Panel to show '{typeof(T)}' was not found!");
-            }
+            // show panel if it exists
         }
 
         public void HidePanel<T>() where T : BasePanel
         {
-            if (_panelLibrary.ContainsKey(typeof(T)))
-            {
-               _panelLibrary[typeof(T)].HidePanel();
-            }
-            else 
-            {
-               Debug.LogWarning($"Panel to hide '{typeof(T)}' was not found!");
-            }
+            // hide panel if it exists
         }
     }
    ```
    ```csharp
     public class ControlsMenuPanel : BasePanel
     {
-        [SerializeField]
-        private Button _goBackButton;
-
-        private void Start()
-        {
-            FirstSelectedButton = _goBackButton;
-            _goBackButton.onClick.AddListener(ShowOptionsMenu);
-        }
-
         private void ShowOptionsMenu()
         {
              UIManager.Instance.HidePanel<MainMenuPanel>();
@@ -414,117 +279,22 @@ Invent time and craft the gears that drive the game's great clock.
    
    > Unity has this pattern already built-in in its own [Execution System](https://docs.unity3d.com/Manual/ExecutionOrder.html).
    
-   > Here are some C++ implementations I made in the past.
+   > Here is a C++ implementation I made in the past.
    ```cpp
    int main() 
    {
-      cout << "WELCOME TO ZORK!" << endl;
-      srand(static_cast<unsigned int>(time(NULL)));
-
-      World world;
-      string input;
-
       while (!world.IsGameOver()) 
       {
-         // Get input
          getline(cin, input);
-
-         // Split string to words
          vector<string> words = Globals::split(input);
 
-         // Exit
-         if (words.size() > 0 && (ACTION_EXIT == Globals::toLowercase(words.at(0)) || ACTION_QUIT == Globals::toLowercase(words.at(0))))
+         if (ShouldExit())
+         {
             break;
+         }
 
-         // Parse command
          world.HandleInput(words);
       }
-
-      cout << "Thanks for playing!" << endl;
-      system("pause");
-      return 0;
-   }
-   ```
-   ```cpp
-   enum class MainState
-   {
-      CREATION,
-      START,
-      UPDATE,
-      FINISH,
-      EXIT
-   };
-
-   Application* App = nullptr;
-
-   int main(int argc, char** argv)
-   {
-      srand(static_cast<unsigned>(time(NULL)));
-
-      int main_return = EXIT_FAILURE;
-      MainState state = MainState::CREATION;
-
-      while (state != MainState::EXIT)
-      {
-         switch (state)
-         {
-            case MainState::CREATION:
-               LOG("Application Creation --------------");
-
-               App = new Application();
-               state = MainState::START;
-               break;
-
-            case MainState::START:
-               LOG("Application Init --------------");
-
-               if (!App->Init())
-               {
-                  LOG("Application Init exits with error -----");
-                  state = MainState::EXIT;
-               }
-               else
-               {
-                  state = MainState::UPDATE;
-                  LOG("Application Update --------------");
-               }
-               break;
-
-            case MainState::UPDATE:
-            {
-               UpdateStatus update_return = App->Update();
-
-               if (update_return == UpdateStatus::ERRORS)
-               {
-                  LOG("Application Update exits with error -----");
-                  state = MainState::EXIT;
-               }
-
-               if (update_return == UpdateStatus::STOP)
-                  state = MainState::FINISH;
-            }
-            break;
-
-            case MainState::FINISH:
-               LOG("Application CleanUp --------------");
-
-               if (!App->CleanUp())
-               {
-                  LOG("Application CleanUp exits with error -----");
-               }
-               else
-               {
-                  main_return = EXIT_SUCCESS;
-               }
-
-               state = MainState::EXIT;
-               break;
-         }
-      }
-
-      delete App;
-      _CrtDumpMemoryLeaks();
-      return main_return;
    }
    ```
 * ### Update Method
@@ -545,54 +315,6 @@ Invent time and craft the gears that drive the game's great clock.
        {
 
        }
-   }
-   ```
-   > Here is a C++ implementation I made in the past.
-   ```cpp
-   bool Application::Init()
-   {
-      bool ret = true;
-
-      for (auto it = modules.begin(); it != modules.end() && ret; ++it)
-         ret = (*it)->Init(); 
-
-      for (auto it = modules.begin(); it != modules.end() && ret; ++it)
-         if ((*it)->IsEnabled())
-            ret = (*it)->Start();
-
-      // Start the first scene 
-      fade->FadeToBlack(scene_menu.get(), nullptr, 3.f);
-
-      return ret;
-   }
-
-   UpdateStatus Application::Update()
-   {
-      UpdateStatus ret = UpdateStatus::CONTINUE;
-
-      for (auto it = modules.begin(); it != modules.end() && ret == UpdateStatus::CONTINUE; ++it)
-         if ((*it)->IsEnabled())
-            ret = (*it)->PreUpdate();
-
-      for (auto it = modules.begin(); it != modules.end() && ret == UpdateStatus::CONTINUE; ++it)
-         if ((*it)->IsEnabled())
-            ret = (*it)->Update();
-
-      for (auto it = modules.begin(); it != modules.end() && ret == UpdateStatus::CONTINUE; ++it)
-         if ((*it)->IsEnabled())
-            ret = (*it)->PostUpdate();
-
-      return ret;
-   }
-
-   bool Application::CleanUp()
-   {
-      bool ret = true;
-
-      for (auto it = modules.rbegin(); it != modules.rend() && ret; ++it)
-            ret = (*it)->CleanUp();
-
-      return ret;
    }
    ```
 
