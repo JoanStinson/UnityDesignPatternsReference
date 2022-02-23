@@ -2,13 +2,14 @@
 
 namespace JGM.Game.State
 {
+    [RequireComponent(typeof(BikeController))]
     public class ClientState : MonoBehaviour
     {
         private BikeController _bikeController;
 
-        private void Start()
+        private void Awake()
         {
-            _bikeController = (BikeController)FindObjectOfType(typeof(BikeController));
+            _bikeController = GetComponent<BikeController>();
         }
 
         private void OnGUI()

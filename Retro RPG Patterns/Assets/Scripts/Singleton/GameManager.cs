@@ -9,13 +9,9 @@ namespace JGM.Game.Singleton
         private DateTime _sessionStartTime;
         private DateTime _sessionEndTime;
 
-        private void Start()
+        protected override void Awake()
         {
-            // TODO:
-            // - Load player save
-            // - If no save, redirect player to registration scene
-            // - Call backend and get daily challenge and rewards 
-
+            base.Awake();
             _sessionStartTime = DateTime.Now;
             Debug.Log("Game session start @: " + DateTime.Now);
         }

@@ -5,12 +5,8 @@ namespace JGM.Game.State
 {
     public class BikeController : MonoBehaviour
     {
-        [field: SerializeField] 
-        public float MaxSpeed { get; private set; } = 2.0f;
-
-        [field: SerializeField] 
-        public float TurnDistance { get; private set; } = 2.0f;
-
+        [field: SerializeField] public float MaxSpeed { get; private set; } = 2.0f;
+        [field: SerializeField] public float TurnDistance { get; private set; } = 2.0f;
         public float CurrentSpeed { get; set; }
         public Direction CurrentTurnDirection { get; private set; }
 
@@ -20,7 +16,7 @@ namespace JGM.Game.State
 
         private BikeStateContext _bikeStateContext;
 
-        private void Start()
+        private void Awake()
         {
             _bikeStateContext = new BikeStateContext(this);
             _startState = gameObject.AddComponent<BikeStartState>();

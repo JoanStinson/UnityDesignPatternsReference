@@ -26,7 +26,7 @@ namespace JGM.Game.Singleton
             }
         }
 
-        public virtual void Awake()
+        protected virtual void Awake()
         {
             if (_instance == null)
             {
