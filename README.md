@@ -46,6 +46,8 @@ Define a concrete communication scheme between objects.
    Provides the ability to restore an object to its previous state (undo).
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Memento.png)
+   
+   > Similar to the State pattern, but with an extra feature that gives objects the ability to roll back to a previous state.
 * ### Observer
    It's a publish/subscribe pattern, which allows  a number of observer objects to see an event.
    
@@ -55,7 +57,7 @@ Define a concrete communication scheme between objects.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/State.png)
    
-   > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html) (also known as 'Mecanim'). 
+   > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html) (also known as 'Mecanim'). Actually, it uses an FSM (Finite State Machine), which uses the State pattern, but with blending and transitions.
    ```csharp
     [RequiredByNativeCode]
     public abstract class StateMachineBehaviour : ScriptableObject
