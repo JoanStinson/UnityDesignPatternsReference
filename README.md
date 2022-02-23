@@ -107,6 +107,8 @@ Define a concrete communication scheme between objects.
    Defines the skeleton of an algorithm as an abstract class, allowing its subclasses to provide concrete behavior.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Template%20Method.png)
+   
+   > This is basically the definition of polymorphism.
 * ### Type Object
    Allows a flexible creation of new “classes” by creating a single class, each instance of which represents a different type of object.
 * ### Visitor
