@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Patterns/EventBusScene.unity
     guid: 9b73349a421a9ab4496f7c985ce63178
+  - enabled: 1
+    path: Assets/Scenes/Patterns/CommandScene.unity
+    guid: 7eb543c9ec6525041905270cab4190c0
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 4bea8a8559d55434694996a679527841, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: b60debb3d44135344bec22fdd3c1b23b, type: 2}
