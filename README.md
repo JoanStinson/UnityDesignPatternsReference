@@ -33,7 +33,7 @@ Define a concrete communication scheme between objects.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Interpreter.png)
    
-   > Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/).
+   > Similar to the Bytecode pattern, Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/).
 * ### Iterator
    Accesses the elements of an object sequentially without exposing its underlying representation.
    
@@ -49,9 +49,11 @@ Define a concrete communication scheme between objects.
    
    > Similar to the State pattern, but with an extra feature that gives objects the ability to roll back to a previous state.
 * ### Observer
-   It's a publish/subscribe pattern, which allows  a number of observer objects to see an event.
+   It's a publish/subscribe pattern, which allows a number of observer objects to see an event.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Observer.png)
+   
+   > Any publish/subscribe structure forms part of this pattern. This way, C# [Delegates](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/), [Actions](https://docs.microsoft.com/en-us/dotnet/api/system.action-1?view=net-6.0), [Event Actions](https://www.reddit.com/r/csharp/comments/m7o16r/what_is_the_difference_between_action_and_event/) and [EventHandlers](https://docs.microsoft.com/en-us/dotnet/api/system.eventhandler?view=net-6.0) are its most basic implementation. [Click Here For A Summary Of All](https://medium.com/nerd-for-tech/c-delegates-actions-events-summary-please-8fab0244a40a). Unity's API has [UnityActions](https://docs.unity3d.com/ScriptReference/Events.UnityAction.html) and [UnityEvents](https://docs.unity3d.com/ScriptReference/Events.UnityEvent.html) which are basically a wrapper of these C# events, but made available through the Inspector. From this point on, the pattern can be expanded to be more or less decoupled until reaching it's final form, which would be a Message or Event Bus System. Here is a basic implementation using Scriptable Objects: [Event Bus System with Scriptable Objects](https://github.com/JoanStinson/SlotsMachine).
 * ### State
    Allows an object to alter its behavior when its internal state changes.
    
