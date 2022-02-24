@@ -14,7 +14,7 @@ namespace JGM.Patterns.ObjectPool
             {
                 if (_pool == null)
                 {
-                    _pool = new ObjectPool<Drone>(CreatedPooledItem, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject, true, _poolSize, _poolSize);
+                    _pool = new ObjectPool<Drone>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject, true, _poolSize, _poolSize);
                 }
                 return _pool;
             }
@@ -22,11 +22,11 @@ namespace JGM.Patterns.ObjectPool
 
         private IObjectPool<Drone> _pool;
 
-        private Drone CreatedPooledItem()
+        private Drone CreatePooledItem()
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.name = "Drone";
-            Drone drone = go.AddComponent<Drone>();
+            var droneGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            droneGO.name = "Drone";
+            var drone = droneGO.AddComponent<Drone>();
             drone.Pool = Pool;
             return drone;
         }
@@ -46,7 +46,7 @@ namespace JGM.Patterns.ObjectPool
             Destroy(drone.gameObject);
         }
 
-        public void Spawn()
+        public void SpawnPooledItemInRandomPos()
         {
             var amount = Random.Range(1, 10);
 

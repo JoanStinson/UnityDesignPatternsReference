@@ -15,7 +15,7 @@ namespace JGM.Patterns.ObjectPool
         {
             if (GUILayout.Button("Spawn Drones"))
             {
-                _pool.Spawn();
+                _pool.SpawnPooledItemInRandomPos();
             }
         }
     }
