@@ -16,73 +16,117 @@ A tiny retro action RPG implementation made applying Software Design Patterns to
 
 ## 🔊 Behavioral Patterns
 Define a concrete communication scheme between objects.
-* ### Bytecode
+
+<details>
+   <summary><b>🔊 Bytecode</b></summary>
+  
+   ### Bytecode
    Give a behavior the flexibility of data by encoding it as instructions for a virtual machine.
-   
+
    > Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/). 
-* ### Chain of Responsibility
+</details>
+
+<details>
+   <summary><b>🔊 Chain of Responsibility</b></summary>
+   
+   ### Chain of Responsibility
    Delegates commands to a chain of processing objects.
    
-   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Chain%20of%20Responsibility.png)
-* ### Command
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Chain%20of%20Responsibility.png)   
+</details>
+
+<details>
+   <summary><b>🔊 Command</b></summary>
+   
+   ### Command
    Creates objects that encapsulate actions and parameters.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Command.png)
-* ### Interpreter
+</details>
+
+<details>
+   <summary><b>🔊 Interpreter</b></summary>
+   
+   ### Interpreter
    Implements a specialized language.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Interpreter.png)
    
    > Similar to the Bytecode pattern, Unity has this pattern already built-in in its own [Visual Scripting System](https://docs.unity3d.com/2021.1/Documentation/Manual/com.unity.visualscripting.html) (previously named 'Bolt') and in its [Shader Graph System](https://docs.unity3d.com/Manual/shader-graph.html). Unreal has this pattern already built-in too in its [Blueprint Visual Scripting System](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/).
-* ### Iterator
+</details>
+
+<details>
+   <summary><b>🔊 Iterator</b></summary>
+   
+   ### Iterator
    Accesses the elements of an object sequentially without exposing its underlying representation.
    
-   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Iterator.png)
-* ### Mediator
+   ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Iterator.png) 
+</details>
+
+<details>
+   <summary><b>🔊 Mediator</b></summary>
+   
+   ### Mediator
    Allows loose coupling between classes by being the only class that has detailed knowledge of their methods.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Mediator.png)
-* ### Memento
+</details>
+
+<details>
+   <summary><b>🔊 Memento</b></summary>
+   
+   ### Memento
    Provides the ability to restore an object to its previous state (undo).
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Memento.png)
    
    > Similar to the State pattern, but with an extra feature that gives objects the ability to roll back to a previous state.
-* ### Observer
+</details>
+
+<details>
+   <summary><b>🔊 Observer</b></summary>
+   
+   ### Observer
    It's a publish/subscribe pattern, which allows a number of observer objects to see an event.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Observer.png)
    
    > Any publish/subscribe structure forms part of this pattern. This way, C# [Delegates](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/), [Actions](https://docs.microsoft.com/en-us/dotnet/api/system.action-1?view=net-6.0), [Event Actions](https://www.reddit.com/r/csharp/comments/m7o16r/what_is_the_difference_between_action_and_event/) and [EventHandlers](https://docs.microsoft.com/en-us/dotnet/api/system.eventhandler?view=net-6.0) are its most basic implementation. [Click Here For A Summary Of All](https://medium.com/nerd-for-tech/c-delegates-actions-events-summary-please-8fab0244a40a). Unity's API has [UnityActions](https://docs.unity3d.com/ScriptReference/Events.UnityAction.html) and [UnityEvents](https://docs.unity3d.com/ScriptReference/Events.UnityEvent.html) which are basically a wrapper of these C# events, but made available through the Inspector. From this point on, the pattern can be expanded to be more or less decoupled until reaching it's final form, which would be a Message or Event Bus System. Here is a basic implementation using Scriptable Objects: [Event Bus System with Scriptable Objects](https://github.com/JoanStinson/SlotsMachine).
-* ### State
+</details>
+
+<details>
+   <summary><b>🔊 State</b></summary>
+   
+   ### State
    Allows an object to alter its behavior when its internal state changes.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/State.png)
    
    > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html) (also known as 'Mecanim'). Actually, it uses an FSM (Finite State Machine), which uses the State pattern, but with blending and transitions.
    ```csharp
-    [RequiredByNativeCode]
-    public abstract class StateMachineBehaviour : ScriptableObject
-    {
-        protected StateMachineBehaviour();
+   [RequiredByNativeCode]
+   public abstract class StateMachineBehaviour : ScriptableObject
+   {
+       protected StateMachineBehaviour();
 
-        public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash);
-        public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
-        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash);
-        public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
-        
-        public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-        public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-        public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-        public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        
-        public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-        public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-        public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-        public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-    }
+       public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash);
+       public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
+       public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash);
+       public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
+
+       public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
+       public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+       public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
+       public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+       public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
+       public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+
+       public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
+       public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+       public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
+       public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+   }
    ```
    ```csharp
    public class EnemyIdle : StateMachineBehaviour
@@ -99,40 +143,85 @@ Define a concrete communication scheme between objects.
        }
    }
    ```
-* ### Strategy
+</details>
+
+<details>
+   <summary><b>🔊 Strategy</b></summary>
+   
+   ### Strategy
    Allows one of a family of algorithms to be selected on-the-fly at runtime.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Strategy.png)
-* ### Subclass Sandbox
+</details>
+
+<details>
+   <summary><b>🔊 Subclass Sandbox</b></summary>
+   
+   ### Subclass Sandbox
    Defines the behavior in a subclass using a set of operations provided by its base class.
-* ### Template Method
+</details>
+
+<details>
+   <summary><b>🔊 Template Method</b></summary>
+   
+### Template Method
    Defines the skeleton of an algorithm as an abstract class, allowing its subclasses to provide concrete behavior.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Template%20Method.png)
    
    > This is basically the definition of polymorphism.
-* ### Type Object
+</details>
+
+<details>
+   <summary><b>🔊 Type Object</b></summary>
+   
+   ### Type Object
    Allows a flexible creation of new “classes” by creating a single class, each instance of which represents a different type of object.
-* ### Visitor
+</details>
+
+<details>
+   <summary><b>🔊 Visitor</b></summary>
+   
+   ### Visitor
    Separates an algorithm from an object structure by moving the hierarchy of methods into one object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Visitor.png)
+</details>
 
 ## 🐣 Creational Patterns
 Create objects, rather than instantiating them directly.
-* ### Abstract Factory
+
+<details>
+   <summary><b>🐣 Abstract Factory</b></summary>
+   
+   ### Abstract Factory
    Groups object factories that have a common theme.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Abstract%20Factory.png)
-* ### Builder
+</details>
+
+<details>
+   <summary><b>🐣 Builder</b></summary>
+   
+   ### Builder
    Constructs complex objects by separating construction and representation.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Builder.png)
-* ### Factory Method
+</details>
+
+<details>
+   <summary><b>🐣 Factory Method</b></summary>
+   
+   ### Factory Method
    Creates objects without specifying the exact class to create.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Factory%20Method.png)
-* ### Prototype
+</details>
+
+<details>
+   <summary><b>🐣 Prototype</b></summary>
+   
+   ### Prototype
    Creates objects by cloning an existing object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Prototype.png)
@@ -153,7 +242,12 @@ Create objects, rather than instantiating them directly.
        }
    }
    ```
-* ### Singleton
+</details>
+
+<details>
+   <summary><b>🐣 Singleton</b></summary>
+   
+   ### Singleton
    Restricts object creation for a class to only one instance.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Creational%20Patterns/Singleton.png)
@@ -231,10 +325,15 @@ Create objects, rather than instantiating them directly.
         }
     }
    ```
+</details>
 
 ## ✂️ Decoupling Patterns
 Split dependencies to ensure that changing a piece of code doesn't require changing another one.
-* ### Component
+   
+<details>
+   <summary><b>✂️ Component</b></summary>
+   
+   ### Component
    Allows a single entity to span multiple domains without coupling the domains to each other.
    
    > Unity has this pattern already built-in in its own [Component System](https://docs.unity3d.com/ScriptReference/Component.html).
@@ -256,31 +355,71 @@ Split dependencies to ensure that changing a piece of code doesn't require chang
         }
     }
    ```
-* ### Event Queue
+</details>
+
+<details>
+   <summary><b>✂️ Event Queue</b></summary>
+   
+   ### Event Queue
    Decouples when an event is sent and when it is executed.
-* ### Service Locator
+</details>
+
+<details>
+   <summary><b>✂️ Service Locator</b></summary>
+   
+   ### Service Locator
    Provides global access to services without being attached to the concrete class.
+</details>
 
 ## 🛠️ Optimization Patterns
 Speed up the game by pushing the hardware to the furthest.
-* ### Data Locality
+
+<details>
+   <summary><b>🛠️ Data Locality</b></summary>
+   
+   ### Data Locality
    Accelerates memory access by arranging data to take advantage of CPU caching.
-* ### Dirty Flag
+</details>
+
+<details>
+   <summary><b>🛠️ Dirty Flag</b></summary>
+   
+   ### Dirty Flag
    Avoids unnecessary work by deferring it until the result is needed.
-* ### Object Pool
+</details>
+
+<details>
+   <summary><b>🛠️ Object Pool</b></summary>
+   
+   ### Object Pool
    Allows the recycling of objects and optimizes performance and memory.
-* ### Spatial Partition
+</details>
+
+<details>
+   <summary><b>🛠️ Spatial Partition</b></summary>
+   
+   ### Spatial Partition
    Locates objects efficiently by storing them in a data structure organized by their positions.
    
    > Unity has this pattern already built-in in its own [Frustum Culling System](https://forum.unity.com/threads/frustum-culling.2752/). It uses an octree for culling objects.
+</details>
 
 ## ⏰ Sequencing Patterns
 Invent time and craft the gears that drive the game's great clock.
-* ### Double Buffer
+   
+<details>
+   <summary><b>⏰ Double Buffer</b></summary>
+   
+   ### Double Buffer
    Causes a series of sequential operations to appear instantaneous or simultaneous.
    
    > Unity has this pattern already built-in in its own [Rendering System](https://answers.unity.com/questions/203931/double-buffering.html). It uses 2 or even more buffers by native implementation.
-* ### Game Loop
+</details>
+
+<details>
+   <summary><b>⏰ Game Loop</b></summary>
+   
+   ### Game Loop
    Decouples the progression of game time from user input and processor speed.
    
    > Unity has this pattern already built-in in its own [Execution System](https://docs.unity3d.com/Manual/ExecutionOrder.html).
@@ -303,7 +442,12 @@ Invent time and craft the gears that drive the game's great clock.
       }
    }
    ```
-* ### Update Method
+</details>
+   
+<details>
+   <summary><b>⏰ Update Method</b></summary>
+   
+   ### Update Method
    Simulates a collection of independent objects by telling each to process one frame of behavior at a time.
    
    > Unity has this pattern already built-in in its [MonoBehaviour](https://docs.unity3d.com/ScriptReference/MonoBehaviour.html) base class, from which every Unity script derives.
@@ -323,36 +467,72 @@ Invent time and craft the gears that drive the game's great clock.
        }
    }
    ```
+</details>
 
 ## 🧬 Structural Patterns
 Use inheritance to compose interfaces and define ways to compose objects to obtain new functionality.
-* ### Adapter
+   
+<details>
+   <summary><b>🧬 Adapter</b></summary>
+   
+   ### Adapter
    Allows classes with incompatible interfaces to work together by wrapping its own interface around that of an already existing class.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Adapter.png)
-* ### Bridge
+</details>
+
+<details>
+   <summary><b>🧬 Bridge</b></summary>
+   
+   ### Bridge
    Decouples an abstraction from its implementation so that the two can vary independently.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Bridge.png)
-* ### Composite
+</details>
+
+<details>
+   <summary><b>🧬 Composite</b></summary>
+   
+   ### Composite
    Composes zero-or-more similar objects so that they can be manipulated as one object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Composite.png)
-* ### Decorator
+</details>
+
+<details>
+   <summary><b>🧬 Decorator</b></summary>
+   
+   ### Decorator
    Dynamically adds/overrides behavior in an existing method of an object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Decorator.png)
-* ### Facade
+</details>
+
+<details>
+   <summary><b>🧬 Facade</b></summary>
+   
+   ### Facade
    Provides a simplified interface to a large body of code.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Facade.png)
-* ### Flyweight
+</details>
+
+<details>
+   <summary><b>🧬 Flyweight</b></summary>
+   
+   ### Flyweight
    Reduces the cost of creating and manipulating a large number of similar objects.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Flyweight.png)
       
    > Unity has this pattern already built-in in its [Prefabs System](https://docs.unity3d.com/Manual/Prefabs.html) by referencing the data of 1 prefab to instantiate multiple objects that are similar reducing memory usage and the same goes for the [Scriptable Objects System](https://docs.unity3d.com/Manual/class-ScriptableObject.html) as if multiple prefabs reference the same scriptable object, only 1 scriptable object reference will be used for all prefabs (less copies equals less memory).
-* ### Proxy
+</details>
+
+<details>
+   <summary><b>🧬 Proxy</b></summary>
+   
+   ### Proxy
    Provides a placeholder for another object to control access, reduce cost, and reduce complexity.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Proxy.png)
+</details>
