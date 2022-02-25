@@ -7,31 +7,29 @@ namespace JGM.Patterns.Decorator
         private BikeWeapon _bikeWeapon;
         private bool _isWeaponDecorated;
 
-        void Start()
+        private void Awake()
         {
-            _bikeWeapon =
-                (BikeWeapon)
-                FindObjectOfType(typeof(BikeWeapon));
+            _bikeWeapon = (BikeWeapon)FindObjectOfType(typeof(BikeWeapon));
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
-            if (!_isWeaponDecorated)
-                if (GUILayout.Button("Decorate Weapon"))
-                {
-                    _bikeWeapon.Decorate();
-                    _isWeaponDecorated = !_isWeaponDecorated;
-                }
+            if (!_isWeaponDecorated && GUILayout.Button("Decorate Weapon"))
+            {
+                _bikeWeapon.Decorate();
+                _isWeaponDecorated = !_isWeaponDecorated;
+            }
 
-            if (_isWeaponDecorated)
-                if (GUILayout.Button("Reset Weapon"))
-                {
-                    _bikeWeapon.Reset();
-                    _isWeaponDecorated = !_isWeaponDecorated;
-                }
+            if (_isWeaponDecorated && GUILayout.Button("Reset Weapon"))
+            {
+                _bikeWeapon.Reset();
+                _isWeaponDecorated = !_isWeaponDecorated;
+            }
 
             if (GUILayout.Button("Toggle Fire"))
+            {
                 _bikeWeapon.ToggleFire();
+            }
         }
     }
 }

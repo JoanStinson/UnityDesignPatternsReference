@@ -5,10 +5,8 @@
         private readonly IWeapon _decoratedWeapon;
         private readonly WeaponAttachment _attachment;
 
-        public WeaponDecorator(
-            IWeapon weapon, WeaponAttachment attachment)
+        public WeaponDecorator(IWeapon weapon, WeaponAttachment attachment)
         {
-
             _attachment = attachment;
             _decoratedWeapon = weapon;
         }
@@ -17,8 +15,7 @@
         {
             get
             {
-                return _decoratedWeapon.Rate
-                       + _attachment.Rate;
+                return _decoratedWeapon.Rate + _attachment.Rate;
             }
         }
 
@@ -26,8 +23,7 @@
         {
             get
             {
-                return _decoratedWeapon.Range
-                       + _attachment.Range;
+                return _decoratedWeapon.Range + _attachment.Range;
             }
         }
 
@@ -35,8 +31,7 @@
         {
             get
             {
-                return _decoratedWeapon.Strength
-                       + _attachment.Strength;
+                return _decoratedWeapon.Strength + _attachment.Strength;
             }
         }
 
@@ -44,8 +39,7 @@
         {
             get
             {
-                return _decoratedWeapon.Cooldown
-                       + _attachment.Cooldown;
+                return _decoratedWeapon.Cooldown + _attachment.Cooldown;
             }
         }
     }

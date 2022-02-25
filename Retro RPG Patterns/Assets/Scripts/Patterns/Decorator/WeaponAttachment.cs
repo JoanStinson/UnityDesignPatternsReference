@@ -2,8 +2,7 @@
 
 namespace JGM.Patterns.Decorator
 {
-    [CreateAssetMenu(fileName = "NewWeaponAttachment",
-        menuName = "Weapon/Attachment", order = 1)]
+    [CreateAssetMenu(fileName = "NewWeaponAttachment", menuName = "Weapon/Attachment", order = 1)]
     public class WeaponAttachment : ScriptableObject, IWeapon
     {
         [Range(0, 50)]

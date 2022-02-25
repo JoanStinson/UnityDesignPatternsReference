@@ -5,52 +5,37 @@ namespace JGM.Patterns.Decorator
 {
     public class BikeWeapon : MonoBehaviour
     {
-        public WeaponConfig weaponConfig;
-        public WeaponAttachment mainAttachment;
-        public WeaponAttachment secondaryAttachment;
+        public WeaponConfig WeaponConfig;
+        public WeaponAttachment MainAttachment;
+        public WeaponAttachment SecondaryAttachment;
 
-        private bool _isFiring;
         private IWeapon _weapon;
+        private bool _isFiring;
         private bool _isDecorated;
 
-        void Start()
+        private void Awake()
         {
-            _weapon = new Weapon(weaponConfig);
+            _weapon = new Weapon(WeaponConfig);
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             GUI.color = Color.green;
+            GUI.Label(new Rect(5, 50, 150, 100), "Range: " + _weapon.Range);
+            GUI.Label(new Rect(5, 70, 150, 100), "Strength: " + _weapon.Strength);
+            GUI.Label(new Rect(5, 90, 150, 100), "Cooldown: " + _weapon.Cooldown);
+            GUI.Label(new Rect(5, 110, 150, 100), "Firing Rate: " + _weapon.Rate);
+            GUI.Label(new Rect(5, 130, 150, 100), "Weapon Firing: " + _isFiring);
 
-            GUI.Label(
-                new Rect(5, 50, 150, 100),
-                "Range: " + _weapon.Range);
+            if (MainAttachment && _isDecorated)
+            {
+                GUI.Label(new Rect(5, 150, 150, 100), "Main Attachment: " + MainAttachment.name);
+            }
 
-            GUI.Label(
-                new Rect(5, 70, 150, 100),
-                "Strength: " + _weapon.Strength);
-
-            GUI.Label(
-                new Rect(5, 90, 150, 100),
-                "Cooldown: " + _weapon.Cooldown);
-
-            GUI.Label(
-                new Rect(5, 110, 150, 100),
-                "Firing Rate: " + _weapon.Rate);
-
-            GUI.Label(
-                new Rect(5, 130, 150, 100),
-                "Weapon Firing: " + _isFiring);
-
-            if (mainAttachment && _isDecorated)
-                GUI.Label(
-                    new Rect(5, 150, 150, 100),
-                    "Main Attachment: " + mainAttachment.name);
-
-            if (secondaryAttachment && _isDecorated)
-                GUI.Label(
-                    new Rect(5, 170, 200, 100),
-                    "Secondary Attachment: " + secondaryAttachment.name);
+            if (SecondaryAttachment && _isDecorated)
+            {
+                GUI.Label(new Rect(5, 170, 200, 100), "Secondary Attachment: " + SecondaryAttachment.name);
+            }
         }
 
         public void ToggleFire()
@@ -58,10 +43,12 @@ namespace JGM.Patterns.Decorator
             _isFiring = !_isFiring;
 
             if (_isFiring)
+            {
                 StartCoroutine(FireWeapon());
+            }
         }
 
-        IEnumerator FireWeapon()
+        private IEnumerator FireWeapon()
         {
             float firingRate = 1.0f / _weapon.Rate;
 
@@ -74,21 +61,21 @@ namespace JGM.Patterns.Decorator
 
         public void Reset()
         {
-            _weapon = new Weapon(weaponConfig);
+            _weapon = new Weapon(WeaponConfig);
             _isDecorated = !_isDecorated;
         }
 
         public void Decorate()
         {
-            if (mainAttachment && !secondaryAttachment)
-                _weapon =
-                    new WeaponDecorator(_weapon, mainAttachment);
+            if (MainAttachment && !SecondaryAttachment)
+            {
+                _weapon = new WeaponDecorator(_weapon, MainAttachment);
+            }
 
-            if (mainAttachment && secondaryAttachment)
-                _weapon =
-                    new WeaponDecorator(
-                        new WeaponDecorator(
-                            _weapon, mainAttachment), secondaryAttachment);
+            if (MainAttachment && SecondaryAttachment)
+            {
+                _weapon = new WeaponDecorator(new WeaponDecorator(_weapon, MainAttachment), SecondaryAttachment);
+            }
 
             _isDecorated = !_isDecorated;
         }
