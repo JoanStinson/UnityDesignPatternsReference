@@ -5,6 +5,8 @@ namespace JGM.Patterns.EventBus
 {
     public class RaceEventBus
     {
+        protected RaceEventBus() { }
+
         private static readonly IDictionary<RaceEventType, UnityEvent> _events = new Dictionary<RaceEventType, UnityEvent>();
 
         public static void Subscribe(RaceEventType eventType, UnityAction listener)
