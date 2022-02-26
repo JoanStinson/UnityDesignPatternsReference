@@ -515,6 +515,8 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    Provides a simplified interface to a large body of code.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Facade.png)
+   
+   > The Facade pattern establishes a new interface, whereas the Adapter pattern adapts an old interface.
 </details>
 
 <details>
