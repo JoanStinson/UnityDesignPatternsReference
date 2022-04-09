@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Patterns/FacadePattern.unity
     guid: 49ec4205130cba441bf89c3a5340f725
+  - enabled: 1
+    path: Assets/Scenes/Patterns/ServiceLocatorScene.unity
+    guid: 17787ed35bba36f43ac74a0d3b774b0a
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 4bea8a8559d55434694996a679527841, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: b60debb3d44135344bec22fdd3c1b23b, type: 2}
