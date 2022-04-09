@@ -42,6 +42,235 @@ Define a concrete communication scheme between objects.
    Creates objects that encapsulate actions and parameters.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Command.png)
+   
+   ```csharp
+   public class InputHandler : MonoBehaviour
+   {
+       private Invoker _invoker;
+       private BikeController _bikeController;
+       private Command _turnLeftCommand;
+       private Command _turnRightCommand;
+       private Command _toggleTurboCommand;
+       private bool _isReplaying;
+       private bool _isRecording;
+
+       private void Awake()
+       {
+           _invoker = gameObject.AddComponent<Invoker>();
+           _bikeController = FindObjectOfType<BikeController>();
+           _turnLeftCommand = new TurnLeft(_bikeController);
+           _turnRightCommand = new TurnRight(_bikeController);
+           _toggleTurboCommand = new ToggleTurbo(_bikeController);
+       }
+
+       private void Update()
+       {
+           if (!_isReplaying && _isRecording)
+           {
+               if (Input.GetKeyUp(KeyCode.A))
+               {
+                   _invoker.ExecuteCommand(_turnLeftCommand);
+               }
+
+               if (Input.GetKeyUp(KeyCode.D))
+               {
+                   _invoker.ExecuteCommand(_turnRightCommand);
+               }
+
+               if (Input.GetKeyUp(KeyCode.W))
+               {
+                   _invoker.ExecuteCommand(_toggleTurboCommand);
+               }
+           }
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Start Recording"))
+           {
+               _bikeController.ResetPosition();
+               _isReplaying = false;
+               _isRecording = true;
+               _invoker.Record();
+           }
+
+           if (GUILayout.Button("Stop Recording"))
+           {
+               _bikeController.ResetPosition();
+               _isRecording = false;
+           }
+
+           if (!_isRecording && GUILayout.Button("Start Replay"))
+           {
+               _bikeController.ResetPosition();
+               _isRecording = false;
+               _isReplaying = true;
+               _invoker.Replay();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeController : MonoBehaviour
+   {
+       public enum Direction
+       {
+           Left = -1,
+           Right = 1
+       }
+
+       private bool _isTurboOn;
+       private const float _distance = 1f;
+
+       public void ToggleTurbo()
+       {
+           _isTurboOn = !_isTurboOn;
+       }
+
+       public void Turn(Direction direction)
+       {
+           if (direction == Direction.Left)
+           {
+               transform.Translate(Vector3.left * _distance);
+           }
+           else if (direction == Direction.Right)
+           {
+               transform.Translate(Vector3.right * _distance);
+           }
+       }
+
+       public void ResetPosition()
+       {
+           transform.position = Vector3.zero;
+       }
+   }
+   ```
+   ```csharp
+   public class Invoker : MonoBehaviour
+   {
+       private SortedList<float, Command> _recordedCommands = new SortedList<float, Command>();
+
+       private bool _isRecording;
+       private bool _isReplaying;
+       private float _replayTime;
+       private float _recordingTime;
+
+       public void ExecuteCommand(Command command)
+       {
+           command.Execute();
+
+           if (_isRecording)
+           {
+               _recordedCommands.Add(_recordingTime, command);
+           }
+
+           Debug.Log("Recorded Time: " + _recordingTime);
+           Debug.Log("Recorded Command: " + command);
+       }
+
+       public void Record()
+       {
+           _recordingTime = 0.0f;
+           _isRecording = true;
+       }
+
+       public void Replay()
+       {
+           _replayTime = 0.0f;
+           _isReplaying = true;
+
+           if (_recordedCommands.Count <= 0)
+           {
+               Debug.LogError("No commands to replay!");
+           }
+
+           _recordedCommands.Reverse();
+       }
+
+       private void FixedUpdate()
+       {
+           if (_isRecording)
+           {
+               _recordingTime += Time.fixedDeltaTime;
+           }
+
+           if (_isReplaying)
+           {
+               _replayTime += Time.fixedDeltaTime;
+
+               if (_recordedCommands.Any())
+               {
+                   if (Mathf.Approximately(_replayTime, _recordedCommands.Keys[0]))
+                   {
+                       Debug.Log("Replay Time: " + _replayTime);
+                       Debug.Log("Replay Command: " + _recordedCommands.Values[0]);
+
+                       _recordedCommands.Values[0].Execute();
+                       _recordedCommands.RemoveAt(0);
+                   }
+               }
+               else
+               {
+                   _isReplaying = false;
+               }
+           }
+       }
+   }
+   ```
+   ```csharp
+   public abstract class Command
+   {
+       public abstract void Execute();
+   }
+   ```                                           
+   ```csharp
+   public class TurnLeft : Command
+   {
+       private readonly BikeController _controller;
+
+       public TurnLeft(BikeController controller)
+       {
+           _controller = controller;
+       }
+
+       public override void Execute()
+       {
+           _controller.Turn(BikeController.Direction.Left);
+       }
+   }
+   ```
+   ```csharp
+   public class TurnRight : Command
+   {
+       private readonly BikeController _controller;
+
+       public TurnRight(BikeController controller)
+       {
+           _controller = controller;
+       }
+
+       public override void Execute()
+       {
+           _controller.Turn(BikeController.Direction.Right);
+       }
+   }
+   ```
+   ```csharp
+   public class ToggleTurbo : Command
+   {
+       private readonly BikeController _controller;
+
+       public ToggleTurbo(BikeController controller)
+       {
+           _controller = controller;
+       }
+
+       public override void Execute()
+       {
+           _controller.ToggleTurbo();
+       }
+   }
+   ```
 </details>
 
 <details>
@@ -93,6 +322,228 @@ Define a concrete communication scheme between objects.
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Observer.png)
    
    > Any publish/subscribe structure forms part of this pattern. This way, C# [Delegates](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/), [Actions](https://docs.microsoft.com/en-us/dotnet/api/system.action-1?view=net-6.0), [Event Actions](https://www.reddit.com/r/csharp/comments/m7o16r/what_is_the_difference_between_action_and_event/) and [EventHandlers](https://docs.microsoft.com/en-us/dotnet/api/system.eventhandler?view=net-6.0) are its most basic implementation. [Click Here For A Summary Of All](https://medium.com/nerd-for-tech/c-delegates-actions-events-summary-please-8fab0244a40a). Unity's API has [UnityActions](https://docs.unity3d.com/ScriptReference/Events.UnityAction.html) and [UnityEvents](https://docs.unity3d.com/ScriptReference/Events.UnityEvent.html) which are basically a wrapper of these C# events, but made available through the Inspector. From this point on, the pattern can be expanded to be more or less decoupled until reaching it's final form, which would be a Message or Event Bus System. Here is a basic implementation using Scriptable Objects: [Event Bus System with Scriptable Objects](https://github.com/JoanStinson/SlotsMachine).
+   
+   ```csharp
+   public class ClientObserver : MonoBehaviour
+   {
+       private BikeController _bikeController;
+
+       private void Start()
+       {
+           _bikeController = (BikeController)FindObjectOfType(typeof(BikeController));
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Damage Bike") && _bikeController)
+           {
+               _bikeController.TakeDamage(15.0f);
+           }
+
+           if (GUILayout.Button("Toggle Turbo") && _bikeController)
+           {
+               _bikeController.ToggleTurbo();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public abstract class Subject : MonoBehaviour
+   {
+       private readonly ArrayList _observers = new ArrayList();
+
+       protected void Attach(Observer observer)
+       {
+           if (observer != null)
+           {
+               _observers.Add(observer);
+           }
+           else
+           {
+               Debug.LogWarning("Attached observer cannot be null!");
+           }
+       }
+
+       protected void Detach(Observer observer)
+       {
+           if (observer != null)
+           {
+               _observers.Remove(observer);
+           }
+           else
+           {
+               Debug.LogWarning("Detached observer cannot be null!");
+           }
+       }
+
+       protected void NotifyObservers()
+       {
+           foreach (Observer observer in _observers)
+           {
+               observer?.Notify(this);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeController : Subject
+   {
+       public bool IsTurboOn { get; private set; }
+       public float CurrentHealth => health;
+
+       [SerializeField]
+       private float health = 100f;
+       private CameraController _cameraController;
+       private HUDController _hudController;
+       private bool _isEngineOn;
+
+       private void Awake()
+       {
+           _hudController = gameObject.AddComponent<HUDController>();
+           _cameraController = (CameraController)FindObjectOfType(typeof(CameraController));
+       }
+
+       private void Start()
+       {
+           StartEngine();
+       }
+
+       private void OnEnable()
+       {
+           Attach(_hudController);
+           Attach(_cameraController);
+       }
+
+       private void OnDisable()
+       {
+           Detach(_hudController);
+           Detach(_cameraController);
+       }
+
+       private void StartEngine()
+       {
+           _isEngineOn = true;
+           NotifyObservers();
+       }
+
+       public void ToggleTurbo()
+       {
+           if (_isEngineOn)
+           {
+               IsTurboOn = !IsTurboOn;
+           }
+
+           NotifyObservers();
+       }
+
+       public void TakeDamage(float amount)
+       {
+           health -= amount;
+           IsTurboOn = false;
+           NotifyObservers();
+
+           if (health < 0)
+           {
+               Destroy(gameObject);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public abstract class Observer : MonoBehaviour
+   {
+       public abstract void Notify(Subject subject);
+   }
+   ```
+   ```csharp
+   public class CameraController : Observer
+   {
+       [SerializeField]
+       private float _shakeMagnitude = 0.1f;
+       private bool _isTurboOn;
+       private Vector3 _initialPosition;
+       private BikeController _bikeController;
+
+       private void OnEnable()
+       {
+           _initialPosition = gameObject.transform.localPosition;
+       }
+
+       private void Update()
+       {
+           if (_isTurboOn)
+           {
+               Vector3 newRandomPosition = _initialPosition + (Random.insideUnitSphere * _shakeMagnitude);
+               transform.localPosition = newRandomPosition;
+           }
+           else
+           {
+               transform.localPosition = _initialPosition;
+           }
+       }
+
+       public override void Notify(Subject subject)
+       {
+           if (!_bikeController)
+           {
+               _bikeController = subject.GetComponent<BikeController>();
+           }
+
+           if (_bikeController)
+           {
+               _isTurboOn = _bikeController.IsTurboOn;
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class HUDController : Observer
+   {
+       private bool _isTurboOn;
+       private float _currentHealth;
+       private BikeController _bikeController;
+
+       private void OnGUI()
+       {
+           GUILayout.BeginArea(new Rect(50, 50, 100, 200));
+           {
+               GUILayout.BeginHorizontal("box");
+               GUILayout.Label("Health: " + _currentHealth);
+               GUILayout.EndHorizontal();
+
+               if (_isTurboOn)
+               {
+                   GUILayout.BeginHorizontal("box");
+                   GUILayout.Label("Turbo Activated!");
+                   GUILayout.EndHorizontal();
+               }
+
+               if (_currentHealth <= 50f)
+               {
+                   GUILayout.BeginHorizontal("box");
+                   GUILayout.Label("WARNING: Low Health");
+                   GUILayout.EndHorizontal();
+               }
+           }
+           GUILayout.EndArea();
+       }
+
+       public override void Notify(Subject subject)
+       {
+           if (!_bikeController)
+           {
+               _bikeController = subject.GetComponent<BikeController>();
+           }
+
+           if (_bikeController)
+           {
+               _isTurboOn = _bikeController.IsTurboOn;
+               _currentHealth = _bikeController.CurrentHealth;
+           }
+       }
+   }
+   ```
+
 </details>
 
 <details>
@@ -104,42 +555,174 @@ Define a concrete communication scheme between objects.
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/State.png)
    
    > Unity has this pattern already built-in in its own [Animation System](https://docs.unity3d.com/Manual/AnimationOverview.html) (also known as 'Mecanim'). Actually, it uses an FSM (Finite State Machine), which uses the State pattern, but with blending and transitions.
+
    ```csharp
-   [RequiredByNativeCode]
-   public abstract class StateMachineBehaviour : ScriptableObject
+   [RequireComponent(typeof(BikeController))]
+   public class ClientState : MonoBehaviour
    {
-       protected StateMachineBehaviour();
+       private BikeController _bikeController;
 
-       public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash);
-       public virtual void OnStateMachineEnter(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
-       public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash);
-       public virtual void OnStateMachineExit(Animator animator, int stateMachinePathHash, AnimatorControllerPlayable controller);
+       private void Awake()
+       {
+           _bikeController = GetComponent<BikeController>();
+       }
 
-       public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-       public virtual void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-       public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-       public virtual void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-       public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-       public virtual void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Start Bike"))
+           {
+               _bikeController.StartBike();
+           }
 
-       public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-       public virtual void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
-       public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
-       public virtual void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller);
+           if (GUILayout.Button("Turn Left"))
+           {
+               _bikeController.Turn(Direction.Left);
+           }
+
+           if (GUILayout.Button("Turn Right"))
+           {
+               _bikeController.Turn(Direction.Right);
+           }
+
+           if (GUILayout.Button("Stop Bike"))
+           {
+               _bikeController.StopBike();
+           }
+       }
    }
    ```
    ```csharp
-   public class EnemyIdle : StateMachineBehaviour
+   public class BikeController : MonoBehaviour
    {
-       public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+       [field: SerializeField] public float MaxSpeed { get; private set; } = 2.0f;
+       [field: SerializeField] public float TurnDistance { get; private set; } = 2.0f;
+       public float CurrentSpeed { get; set; }
+       public Direction CurrentTurnDirection { get; private set; }
+
+       private IBikeState _startState;
+       private IBikeState _stopState;
+       private IBikeState _turnState;
+
+       private BikeStateContext _bikeStateContext;
+
+       private void Awake()
        {
-            animator.SetBool("canPursuePlayer", true);
+           _bikeStateContext = new BikeStateContext(this);
+           _startState = gameObject.AddComponent<BikeStartState>();
+           _stopState = gameObject.AddComponent<BikeStopState>();
+           _turnState = gameObject.AddComponent<BikeTurnState>();
+           _bikeStateContext.Transition(_stopState);
        }
 
-       override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+       public void StartBike()
        {
-            WanderRandomlyThroughMap();
-            LookAtPlayerAtRandomIntervals();
+           _bikeStateContext.Transition(_startState);
+       }
+
+       public void StopBike()
+       {
+           _bikeStateContext.Transition(_stopState);
+       }
+
+       public void Turn(Direction direction)
+       {
+           CurrentTurnDirection = direction;
+           _bikeStateContext.Transition(_turnState);
+       }
+   }
+   ```
+   ```csharp
+   public enum Direction
+   {
+       Left = -1,
+       Right = 1
+   }
+   ```
+   ```csharp
+   public class BikeStateContext
+   {
+       public IBikeState CurrentState { get; set; }
+
+       private readonly BikeController _bikeController;
+
+       public BikeStateContext(BikeController bikeController)
+       {
+           _bikeController = bikeController;
+       }
+
+       public void Transition(IBikeState state)
+       {
+           CurrentState = state;
+           CurrentState.Handle(_bikeController);
+       }
+   }
+   ```
+   ```csharp
+   public interface IBikeState
+   {
+       void Handle(BikeController bikeController);
+   }
+   ```
+   ```csharp
+   public class BikeStartState : MonoBehaviour, IBikeState
+   {
+       private BikeController _bikeController;
+
+       public void Handle(BikeController bikeController)
+       {
+           if (!_bikeController)
+           {
+               _bikeController = bikeController;
+           }
+
+           _bikeController.CurrentSpeed = _bikeController.MaxSpeed;
+       }
+
+       private void Update()
+       {
+           if (_bikeController && _bikeController.CurrentSpeed > 0)
+           {
+               Vector3 bikeTranslation = Vector3.forward * (_bikeController.CurrentSpeed * Time.deltaTime);
+               _bikeController.transform.Translate(bikeTranslation);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeTurnState : MonoBehaviour, IBikeState
+   {
+       private Vector3 _turnDirection;
+       private BikeController _bikeController;
+
+       public void Handle(BikeController bikeController)
+       {
+           if (!_bikeController)
+           {
+               _bikeController = bikeController;
+           }
+
+           _turnDirection.x = (float)_bikeController.CurrentTurnDirection;
+
+           if (_bikeController.CurrentSpeed > 0)
+           {
+               transform.Translate(_turnDirection * _bikeController.TurnDistance);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeStopState : MonoBehaviour, IBikeState
+   {
+       private BikeController _bikeController;
+
+       public void Handle(BikeController bikeController)
+       {
+           if (!_bikeController)
+           {
+               _bikeController = bikeController;
+           }
+
+           _bikeController.CurrentSpeed = 0;
        }
    }
    ```
@@ -152,6 +735,178 @@ Define a concrete communication scheme between objects.
    Allows one of a family of algorithms to be selected on-the-fly at runtime.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Strategy.png)
+   
+   ```csharp
+   public class ClientStrategy : MonoBehaviour
+   {
+       private GameObject _drone;
+       private List<IManeuverBehaviour> _components = new List<IManeuverBehaviour>();
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Spawn Drone"))
+           {
+               SpawnDrone();
+           }
+       }
+
+       private void SpawnDrone()
+       {
+           _drone = GameObject.CreatePrimitive(PrimitiveType.Cube);
+           _drone.AddComponent<Drone>();
+           _drone.transform.position = Random.insideUnitSphere * 10;
+           ApplyRandomStrategies();
+       }
+
+       private void ApplyRandomStrategies()
+       {
+           _components.Add(_drone.AddComponent<BoppingManeuver>());
+           _components.Add(_drone.AddComponent<FallbackManeuver>());
+           _components.Add(_drone.AddComponent<WeavingManeuver>());
+
+           int index = Random.Range(0, _components.Count);
+           _drone.GetComponent<Drone>().ApplyStrategy(_components[index]);
+       }
+   }
+   ```
+   ```csharp
+   public class Drone : MonoBehaviour
+   {
+       public float Speed = 1f;
+       public float MaxHeight = 5f;
+       public float WeavingDistance = 1.5f;
+       public float FallbackDistance = 20f;
+
+       private Vector3 _rayDirection;
+       private const float _rayAngle = -45f;
+       private const float _rayDistance = 15f;
+
+       private void Awake()
+       {
+           _rayDirection = transform.TransformDirection(Vector3.back) * _rayDistance;
+           _rayDirection = Quaternion.Euler(_rayAngle, 0f, 0f) * _rayDirection;
+       }
+
+
+       private void Update()
+       {
+           Debug.DrawRay(transform.position, _rayDirection, Color.blue);
+
+           if (Physics.Raycast(transform.position, _rayDirection, out var hitInfo, _rayDistance) && hitInfo.collider)
+           {
+               Debug.DrawRay(transform.position, _rayDirection, Color.green);
+           }
+       }
+
+       public void ApplyStrategy(IManeuverBehaviour strategy)
+       {
+           strategy.Maneuver(this);
+       }
+   }
+   ```
+   ```csharp
+   public interface IManeuverBehaviour
+   {
+       void Maneuver(Drone drone);
+   }
+   ```
+   ```csharp
+   public class BoppingManeuver : MonoBehaviour, IManeuverBehaviour
+   {
+       public void Maneuver(Drone drone)
+       {
+           StartCoroutine(Bopple(drone));
+       }
+
+       private IEnumerator Bopple(Drone drone)
+       {
+           float time;
+           bool isReverse = false;
+           float speed = drone.Speed;
+           Vector3 startPosition = drone.transform.position;
+           Vector3 endPosition = startPosition;
+           endPosition.y = drone.MaxHeight;
+
+           while (true)
+           {
+               time = 0;
+               Vector3 start = drone.transform.position;
+               Vector3 end = (isReverse) ? startPosition : endPosition;
+
+               while (time < speed)
+               {
+                   drone.transform.position = Vector3.Lerp(start, end, time / speed);
+                   time += Time.deltaTime;
+                   yield return null;
+               }
+
+               yield return new WaitForSeconds(1);
+               isReverse = !isReverse;
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class FallbackManeuver : MonoBehaviour, IManeuverBehaviour
+   {
+       public void Maneuver(Drone drone)
+       {
+           StartCoroutine(Fallback(drone));
+       }
+
+       private IEnumerator Fallback(Drone drone)
+       {
+           float time = 0;
+           float speed = drone.Speed;
+           Vector3 startPosition = drone.transform.position;
+           Vector3 endPosition = startPosition;
+           endPosition.z = drone.FallbackDistance;
+
+           while (time < speed)
+           {
+               drone.transform.position = Vector3.Lerp(startPosition, endPosition, time / speed);
+               time += Time.deltaTime;
+               yield return null;
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class WeavingManeuver : MonoBehaviour, IManeuverBehaviour
+   {
+       public void Maneuver(Drone drone)
+       {
+           StartCoroutine(Weave(drone));
+       }
+
+       private IEnumerator Weave(Drone drone)
+       {
+           float time;
+           bool isReverse = false;
+           float speed = drone.Speed;
+           Vector3 startPosition = drone.transform.position;
+           Vector3 endPosition = startPosition;
+           endPosition.x = drone.WeavingDistance;
+
+           while (true)
+           {
+               time = 0;
+               Vector3 start = drone.transform.position;
+               Vector3 end = (isReverse) ? startPosition : endPosition;
+
+               while (time < speed)
+               {
+                   drone.transform.position = Vector3.Lerp(start, end, time / speed);
+                   time += Time.deltaTime;
+                   yield return null;
+               }
+
+               yield return new WaitForSeconds(1);
+               isReverse = !isReverse;
+           }
+       }
+   }
+   ```
 </details>
 
 <details>
@@ -186,6 +941,215 @@ Define a concrete communication scheme between objects.
    Separates an algorithm from an object structure by moving the hierarchy of methods into one object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Behavioral%20Patterns/Visitor.png)
+   
+   ```csharp
+   public class ClientVisitor : MonoBehaviour
+   {
+       [SerializeField] private PowerUpVisitor _enginePowerUp;
+       [SerializeField] private PowerUpVisitor _shieldPowerUp;
+       [SerializeField] private PowerUpVisitor _weaponPowerUp;
+
+       private BikeController _bikeController;
+
+       private void Awake()
+       {
+           _bikeController = gameObject.AddComponent<BikeController>();
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("PowerUp Shield"))
+           {
+               _bikeController.Accept(_shieldPowerUp);
+           }
+
+           if (GUILayout.Button("PowerUp Engine"))
+           {
+               _bikeController.Accept(_enginePowerUp);
+           }
+
+           if (GUILayout.Button("PowerUp Weapon"))
+           {
+               _bikeController.Accept(_weaponPowerUp);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public interface IBikeElementVisitor
+   {
+       void Visit(BikeShieldVisitable bikeShield);
+       void Visit(BikeEngineVisitable bikeEngine);
+       void Visit(BikeWeaponVisitable bikeWeapon);
+   }
+   ```
+   ```csharp
+   [CreateAssetMenu(fileName = "PowerUp", menuName = "PowerUp")]
+   public class PowerUpVisitor : ScriptableObject, IBikeElementVisitor
+   {
+       public string PowerupName;
+       public GameObject PowerupPrefab;
+       public string PowerupDescription;
+
+       [Tooltip("Fully heal shield")]
+       public bool HealShield;
+
+       [Range(0f, 50f)]
+       [Tooltip("Boost turbo settings up to increments of 50/mph")]
+       public float TurboBoost;
+
+       [Range(0f, 25)]
+       [Tooltip("Boost weapon range in increments of up to 25 units")]
+       public int WeaponRange;
+
+       [Range(0.0f, 50f)]
+       [Tooltip("Boost weapon strength in increments of up to 50%")]
+       public float WeaponStrength;
+
+       public void Visit(BikeShieldVisitable bikeShield)
+       {
+           if (HealShield)
+           {
+               bikeShield.HealtPercentage = 100f;
+           }
+       }
+
+       public void Visit(BikeWeaponVisitable bikeWeapon)
+       {
+           int range = bikeWeapon.Range += WeaponRange;
+           bikeWeapon.Range = (range >= bikeWeapon.MaxRange) ? bikeWeapon.MaxRange : range;
+
+           float strength = bikeWeapon.Strength += Mathf.Round(bikeWeapon.Strength * WeaponStrength / 100);
+           bikeWeapon.Strength = (strength >= bikeWeapon.MaxStrength) ? bikeWeapon.MaxStrength : strength;
+       }
+
+       public void Visit(BikeEngineVisitable bikeEngine)
+       {
+           float boost = bikeEngine.TurboBoostInMph += TurboBoost;
+
+           if (boost < 0.0f)
+           {
+               bikeEngine.TurboBoostInMph = 0.0f;
+           }
+           else if (boost >= bikeEngine.MaxTurboBoost)
+           {
+               bikeEngine.TurboBoostInMph = bikeEngine.MaxTurboBoost;
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeController : MonoBehaviour, IBikeElementVisitable
+   {
+       private List<IBikeElementVisitable> _bikeElements = new List<IBikeElementVisitable>();
+
+       private void Awake()
+       {
+           _bikeElements.Add(gameObject.AddComponent<BikeShieldVisitable>());
+           _bikeElements.Add(gameObject.AddComponent<BikeWeaponVisitable>());
+           _bikeElements.Add(gameObject.AddComponent<BikeEngineVisitable>());
+       }
+
+       public void Accept(IBikeElementVisitor visitor)
+       {
+           foreach (IBikeElementVisitable element in _bikeElements)
+           {
+               element.Accept(visitor);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public interface IBikeElementVisitable
+   {
+       void Accept(IBikeElementVisitor visitor);
+   }
+   ```
+   ```csharp
+   public class BikeShieldVisitable : MonoBehaviour, IBikeElementVisitable
+   {
+       public float HealtPercentage = 50f;
+
+       public float Damage(float damage)
+       {
+           return HealtPercentage -= damage;
+       }
+
+       public void Accept(IBikeElementVisitor visitor)
+       {
+           visitor.Visit(this);
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(125, 0, 200, 20), "Shield Health: " + HealtPercentage);
+       }
+   }
+   ```
+   ```csharp
+   public class BikeWeaponVisitable : MonoBehaviour, IBikeElementVisitable
+   {
+       [Header("Range")]
+       public int Range = 5;
+       public int MaxRange = 25;
+
+       [Header("Strength")]
+       public float Strength = 25f;
+       public float MaxStrength = 50f;
+
+       public void Fire()
+       {
+           Debug.Log("Weapon fired!");
+       }
+
+       public void Accept(IBikeElementVisitor visitor)
+       {
+           visitor.Visit(this);
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(125, 40, 200, 20), "Weapon Range: " + Range);
+           GUI.Label(new Rect(125, 60, 200, 20), "Weapon Strength: " + Strength);
+       }
+   }
+   ```
+   ```csharp
+   public class BikeEngineVisitable : MonoBehaviour, IBikeElementVisitable
+   {
+       public float TurboBoostInMph = 25f;
+       public float MaxTurboBoost = 200f;
+
+       private const float _defaultSpeedInMph = 300f;
+       private bool _isTurboOn;
+
+       public float CurrentSpeed
+       {
+           get
+           {
+               return (_isTurboOn) ? _defaultSpeedInMph + TurboBoostInMph : _defaultSpeedInMph;
+           }
+       }
+
+       public void ToggleTurbo()
+       {
+           _isTurboOn = !_isTurboOn;
+       }
+
+       public void Accept(IBikeElementVisitor visitor)
+       {
+           visitor.Visit(this);
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(125, 20, 200, 20), "Turbo Boost: " + TurboBoostInMph);
+       }
+   }
+   ```
 </details>
 
 ## 🐣 Creational Patterns
@@ -479,6 +1443,118 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    Allows classes with incompatible interfaces to work together by wrapping its own interface around that of an already existing class.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Adapter.png)
+   
+   ```csharp
+   public class ClientAdapter : MonoBehaviour
+   {
+       [SerializeField]
+       private InventoryItem _item;
+       private InventorySystem _inventorySystem;
+       private IInventorySystem _inventorySystemAdapter;
+
+       private void Awake()
+       {
+           _inventorySystem = new InventorySystem();
+           _inventorySystemAdapter = new InventorySystemAdapter();
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Add item (no adapter)"))
+           {
+               _inventorySystem.AddItem(_item);
+           }
+
+           if (GUILayout.Button("Add item (with adapter)"))
+           {
+               _inventorySystemAdapter.AddItem(_item, SaveLocation.Both);
+           }
+       }
+   }
+   ```
+   ```csharp
+   public interface IInventorySystem
+   {
+       void SyncInventories();
+       void AddItem(InventoryItem item, SaveLocation location);
+       void RemoveItem(InventoryItem item, SaveLocation location);
+       List<InventoryItem> GetInventory(SaveLocation location);
+   }
+   ```
+   ```csharp
+   [CreateAssetMenu(fileName = "New Item", menuName = "Inventory")]
+   public class InventoryItem : ScriptableObject
+   {
+       // Placeholder class
+   }
+   ```
+   ```csharp
+   public class InventorySystem
+   {
+       public void AddItem(InventoryItem item)
+       {
+           Debug.Log("Adding item to the cloud");
+       }
+
+       public void RemoveItem(InventoryItem item)
+       {
+           Debug.Log("Removing item from the cloud");
+       }
+
+       public List<InventoryItem> GetInventory()
+       {
+           Debug.Log("Returning an inventory list stored in the cloud");
+           return new List<InventoryItem>();
+       }
+   }
+   ```
+   ```csharp
+   public class InventorySystemAdapter : InventorySystem, IInventorySystem
+   {
+       private List<InventoryItem> _cloudInventory;
+
+       public void SyncInventories()
+       {
+           var _cloudInventory = GetInventory();
+           Debug.Log("Synchronizing local drive and cloud inventories");
+       }
+
+       public void AddItem(InventoryItem item, SaveLocation location)
+       {
+           if (location == SaveLocation.Cloud)
+           {
+               AddItem(item);
+           }
+           else if (location == SaveLocation.Local)
+           {
+               Debug.Log("Adding item to local drive");
+           }
+           else if (location == SaveLocation.Both)
+           {
+               Debug.Log("Adding item to local drive and on the cloud");
+           }
+       }
+
+       public void RemoveItem(InventoryItem item, SaveLocation location)
+       {
+           Debug.Log("Remove item from local/cloud/both");
+       }
+
+       public List<InventoryItem> GetInventory(SaveLocation location)
+       {
+           Debug.Log("Get inventory from local/cloud/both");
+           return new List<InventoryItem>();
+       }
+   }
+   ```
+   ```csharp
+   public enum SaveLocation
+   {
+       Local,
+       Cloud,
+       Both
+   }
+   ```
 </details>
 
 <details>
