@@ -1333,6 +1333,126 @@ Split dependencies to ensure that changing a piece of code doesn't require chang
    
    ### Service Locator
    Provides global access to services without being attached to the concrete class.
+   
+   ```csharp
+   public static class ServiceLocator
+   {
+       private static readonly IDictionary<Type, object> Services = new Dictionary<Type, Object>();
+
+       public static void RegisterService<T>(T service)
+       {
+           if (!Services.ContainsKey(typeof(T)))
+           {
+               Services[typeof(T)] = service;
+           }
+           else
+           {
+               throw new ApplicationException("Service already registered");
+           }
+       }
+
+       public static T GetService<T>()
+       {
+           try
+           {
+               return (T)Services[typeof(T)];
+           }
+           catch
+           {
+               throw new ApplicationException("Requested service not found.");
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class ClientServiceLocator : MonoBehaviour
+   {
+       private void Awake()
+       {
+           RegisterServices();
+       }
+
+       private void RegisterServices()
+       {
+           ILoggerService logger = new Logger();
+           ServiceLocator.RegisterService(logger);
+
+           IAnalyticsService analytics = new Analytics();
+           ServiceLocator.RegisterService(analytics);
+
+           IAdvertisement advertisement = new Advertisement();
+           ServiceLocator.RegisterService(advertisement);
+       }
+
+       private void OnGUI()
+       {
+           GUILayout.Label("Review output in the console:");
+
+           if (GUILayout.Button("Log Event"))
+           {
+               ILoggerService logger = ServiceLocator.GetService<ILoggerService>();
+               logger.Log("Hello World!");
+           }
+
+           if (GUILayout.Button("Send Analytics"))
+           {
+               IAnalyticsService analytics = ServiceLocator.GetService<IAnalyticsService>();
+               analytics.SendEvent("Hello World!");
+           }
+
+           if (GUILayout.Button("Display Advertisement"))
+           {
+               IAdvertisement advertisement = ServiceLocator.GetService<IAdvertisement>();
+               advertisement.DisplayAd();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public interface ILoggerService
+   {
+       void Log(string message);
+   }
+   ```
+   ```csharp
+   public class Logger : ILoggerService
+   {
+       public void Log(string message)
+       {
+           Debug.Log("Logged: " + message);
+       }
+   }
+   ```
+   ```csharp
+   public interface IAnalyticsService
+   {
+       void SendEvent(string eventName);
+   }
+   ```
+   ```csharp
+   public class Analytics : IAnalyticsService
+   {
+       public void SendEvent(string eventName)
+       {
+           Debug.Log("Sent: " + eventName);
+       }
+   }
+   ```
+   ```csharp
+   public interface IAdvertisement
+   {
+       void DisplayAd();
+   }
+   ```
+   ```csharp
+   public class Advertisement : IAdvertisement
+   {
+       public void DisplayAd()
+       {
+           Debug.Log("Displaying video advertisement");
+       }
+   }
+   ```
 </details>
 
 ## 🛠️ Optimization Patterns
@@ -1357,6 +1477,139 @@ Speed up the game by pushing the hardware to the furthest.
    
    ### Object Pool
    Allows the recycling of objects and optimizes performance and memory.
+   
+   ```csharp
+   public class ClientObjectPool : MonoBehaviour
+   {
+       private DroneObjectPool _pool;
+
+       private void Awake()
+       {
+           _pool = gameObject.AddComponent<DroneObjectPool>();
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Spawn Drones"))
+           {
+               _pool.SpawnPooledItemInRandomPos();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class DroneObjectPool : MonoBehaviour
+   {
+       [SerializeField]
+       private int _poolSize = 10;
+
+       public IObjectPool<Drone> Pool
+       {
+           get
+           {
+               if (_pool == null)
+               {
+                   _pool = new ObjectPool<Drone>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject, true, _poolSize, _poolSize);
+               }
+               return _pool;
+           }
+       }
+
+       private IObjectPool<Drone> _pool;
+
+       private Drone CreatePooledItem()
+       {
+           var droneGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
+           droneGO.name = "Drone";
+           var drone = droneGO.AddComponent<Drone>();
+           drone.Pool = Pool;
+           return drone;
+       }
+
+       private void OnReturnedToPool(Drone drone)
+       {
+           drone.gameObject.SetActive(false);
+       }
+
+       private void OnTakeFromPool(Drone drone)
+       {
+           drone.gameObject.SetActive(true);
+       }
+
+       private void OnDestroyPoolObject(Drone drone)
+       {
+           Destroy(drone.gameObject);
+       }
+
+       public void SpawnPooledItemInRandomPos()
+       {
+           var amount = Random.Range(1, 10);
+
+           for (int i = 0; i < amount; ++i)
+           {
+               var drone = Pool.Get();
+               drone.transform.position = Random.insideUnitSphere * 10;
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class Drone : MonoBehaviour
+   {
+       public IObjectPool<Drone> Pool { get; set; }
+       public float CurrentHealth;
+
+       [SerializeField] private float _maxHealth = 100.0f;
+       [SerializeField] private float _timeToSelfDestruct = 3.0f;
+
+       private void Awake()
+       {
+           CurrentHealth = _maxHealth;
+       }
+
+       private void OnEnable()
+       {
+           AttackPlayer();
+           StartCoroutine(SelfDestruct());
+       }
+
+       public void AttackPlayer()
+       {
+           Debug.Log("Attack player!");
+       }
+
+       private IEnumerator SelfDestruct()
+       {
+           yield return new WaitForSeconds(_timeToSelfDestruct);
+           TakeDamage(_maxHealth);
+       }
+
+       public void TakeDamage(float amount)
+       {
+           CurrentHealth -= amount;
+
+           if (CurrentHealth <= 0.0f)
+           {
+               ReturnToPool();
+           }
+       }
+
+       private void ReturnToPool()
+       {
+           Pool.Release(this);
+       }
+
+       private void OnDisable()
+       {
+           ResetDrone();
+       }
+
+       private void ResetDrone()
+       {
+           CurrentHealth = _maxHealth;
+       }
+   }
+   ```
 </details>
 
 <details>
@@ -1473,22 +1726,6 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    }
    ```
    ```csharp
-   public interface IInventorySystem
-   {
-       void SyncInventories();
-       void AddItem(InventoryItem item, SaveLocation location);
-       void RemoveItem(InventoryItem item, SaveLocation location);
-       List<InventoryItem> GetInventory(SaveLocation location);
-   }
-   ```
-   ```csharp
-   [CreateAssetMenu(fileName = "New Item", menuName = "Inventory")]
-   public class InventoryItem : ScriptableObject
-   {
-       // Placeholder class
-   }
-   ```
-   ```csharp
    public class InventorySystem
    {
        public void AddItem(InventoryItem item)
@@ -1506,6 +1743,15 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
            Debug.Log("Returning an inventory list stored in the cloud");
            return new List<InventoryItem>();
        }
+   }
+   ```
+   ```csharp
+   public interface IInventorySystem
+   {
+       void SyncInventories();
+       void AddItem(InventoryItem item, SaveLocation location);
+       void RemoveItem(InventoryItem item, SaveLocation location);
+       List<InventoryItem> GetInventory(SaveLocation location);
    }
    ```
    ```csharp
@@ -1548,6 +1794,13 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    }
    ```
    ```csharp
+   [CreateAssetMenu(fileName = "New Item", menuName = "Inventory")]
+   public class InventoryItem : ScriptableObject
+   {
+       // Placeholder class
+   }
+   ```
+   ```csharp
    public enum SaveLocation
    {
        Local,
@@ -1582,6 +1835,297 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    Dynamically adds/overrides behavior in an existing method of an object.
    
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Decorator.png)
+   
+   ```csharp
+   public class ClientDecorator : MonoBehaviour
+   {
+       private BikeWeapon _bikeWeapon;
+       private bool _isWeaponDecorated;
+
+       private void Awake()
+       {
+           _bikeWeapon = (BikeWeapon)FindObjectOfType(typeof(BikeWeapon));
+       }
+
+       private void OnGUI()
+       {
+           if (!_isWeaponDecorated && GUILayout.Button("Decorate Weapon"))
+           {
+               _bikeWeapon.Decorate();
+               _isWeaponDecorated = !_isWeaponDecorated;
+           }
+
+           if (_isWeaponDecorated && GUILayout.Button("Reset Weapon"))
+           {
+               _bikeWeapon.Reset();
+               _isWeaponDecorated = !_isWeaponDecorated;
+           }
+
+           if (GUILayout.Button("Toggle Fire"))
+           {
+               _bikeWeapon.ToggleFire();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeWeapon : MonoBehaviour
+   {
+       public WeaponConfig WeaponConfig;
+       public WeaponAttachment MainAttachment;
+       public WeaponAttachment SecondaryAttachment;
+
+       private IWeapon _weapon;
+       private bool _isFiring;
+       private bool _isDecorated;
+
+       private void Awake()
+       {
+           _weapon = new Weapon(WeaponConfig);
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(5, 50, 150, 100), "Range: " + _weapon.Range);
+           GUI.Label(new Rect(5, 70, 150, 100), "Strength: " + _weapon.Strength);
+           GUI.Label(new Rect(5, 90, 150, 100), "Cooldown: " + _weapon.Cooldown);
+           GUI.Label(new Rect(5, 110, 150, 100), "Firing Rate: " + _weapon.Rate);
+           GUI.Label(new Rect(5, 130, 150, 100), "Weapon Firing: " + _isFiring);
+
+           if (MainAttachment && _isDecorated)
+           {
+               GUI.Label(new Rect(5, 150, 150, 100), "Main Attachment: " + MainAttachment.name);
+           }
+
+           if (SecondaryAttachment && _isDecorated)
+           {
+               GUI.Label(new Rect(5, 170, 200, 100), "Secondary Attachment: " + SecondaryAttachment.name);
+           }
+       }
+
+       public void ToggleFire()
+       {
+           _isFiring = !_isFiring;
+
+           if (_isFiring)
+           {
+               StartCoroutine(FireWeapon());
+           }
+       }
+
+       private IEnumerator FireWeapon()
+       {
+           float firingRate = 1.0f / _weapon.Rate;
+
+           while (_isFiring)
+           {
+               yield return new WaitForSeconds(firingRate);
+               Debug.Log("fire");
+           }
+       }
+
+       public void Reset()
+       {
+           _weapon = new Weapon(WeaponConfig);
+           _isDecorated = !_isDecorated;
+       }
+
+       public void Decorate()
+       {
+           if (MainAttachment && !SecondaryAttachment)
+           {
+               _weapon = new WeaponDecorator(_weapon, MainAttachment);
+           }
+
+           if (MainAttachment && SecondaryAttachment)
+           {
+               _weapon = new WeaponDecorator(new WeaponDecorator(_weapon, MainAttachment), SecondaryAttachment);
+           }
+
+           _isDecorated = !_isDecorated;
+       }
+   }
+   ```
+   ```csharp
+   public interface IWeapon
+   {
+       float Rate { get; }
+       float Range { get; }
+       float Strength { get; }
+       float Cooldown { get; }
+   }
+   ```
+   ```csharp
+   public class Weapon : IWeapon
+   {
+       public float Range
+       {
+           get { return _config.Range; }
+       }
+
+       public float Rate
+       {
+           get { return _config.Rate; }
+       }
+
+       public float Strength
+       {
+           get { return _config.Strength; }
+       }
+
+       public float Cooldown
+       {
+           get { return _config.Cooldown; }
+       }
+
+       private readonly WeaponConfig _config;
+
+       public Weapon(WeaponConfig weaponConfig)
+       {
+           _config = weaponConfig;
+       }
+   }
+   ```
+   ```csharp
+   [CreateAssetMenu(fileName = "NewWeaponConfig", menuName = "Weapon/Config", order = 1)]
+   public class WeaponConfig : ScriptableObject, IWeapon
+   {
+       [Range(0, 60)]
+       [Tooltip("Rate of firing per second")]
+       [SerializeField]
+       private float rate;
+
+       [Range(0, 50)]
+       [Tooltip("Weapon range")]
+       [SerializeField]
+       private float range;
+
+       [Range(0, 100)]
+       [Tooltip("Weapon strength")]
+       [SerializeField]
+       private float strength;
+
+       [Range(0, 5)]
+       [Tooltip("Cooldown duration")]
+       [SerializeField]
+       private float cooldown;
+
+       public string weaponName;
+       public GameObject weaponPrefab;
+       public string weaponDescription;
+
+       public float Rate
+       {
+           get { return rate; }
+       }
+
+       public float Range
+       {
+           get { return range; }
+       }
+
+       public float Strength
+       {
+           get { return strength; }
+       }
+
+       public float Cooldown
+       {
+           get { return cooldown; }
+       }
+   }
+   ```
+   ```csharp
+   [CreateAssetMenu(fileName = "NewWeaponAttachment", menuName = "Weapon/Attachment", order = 1)]
+   public class WeaponAttachment : ScriptableObject, IWeapon
+   {
+       [Range(0, 50)]
+       [Tooltip("Increase rate of firing per second")]
+       [SerializeField] public float rate;
+
+       [Range(0, 50)]
+       [Tooltip("Increase weapon range")]
+       [SerializeField] float range;
+
+       [Range(0, 100)]
+       [Tooltip("Increase weapon strength")]
+       [SerializeField] public float strength;
+
+       [Range(0, -5)]
+       [Tooltip("Reduce cooldown duration")]
+       [SerializeField] public float cooldown;
+
+       public string attachmentName;
+       public GameObject attachmentPrefab;
+       public string attachmentDescription;
+
+       public float Rate
+       {
+           get { return rate; }
+       }
+
+       public float Range
+       {
+           get { return range; }
+       }
+
+       public float Strength
+       {
+           get { return strength; }
+       }
+
+       public float Cooldown
+       {
+           get { return cooldown; }
+       }
+   }
+   ```
+   ```csharp
+   public class WeaponDecorator : IWeapon
+   {
+       private readonly IWeapon _decoratedWeapon;
+       private readonly WeaponAttachment _attachment;
+
+       public WeaponDecorator(IWeapon weapon, WeaponAttachment attachment)
+       {
+           _attachment = attachment;
+           _decoratedWeapon = weapon;
+       }
+
+       public float Rate
+       {
+           get
+           {
+               return _decoratedWeapon.Rate + _attachment.Rate;
+           }
+       }
+
+       public float Range
+       {
+           get
+           {
+               return _decoratedWeapon.Range + _attachment.Range;
+           }
+       }
+
+       public float Strength
+       {
+           get
+           {
+               return _decoratedWeapon.Strength + _attachment.Strength;
+           }
+       }
+
+       public float Cooldown
+       {
+           get
+           {
+               return _decoratedWeapon.Cooldown + _attachment.Cooldown;
+           }
+       }
+   }
+   ```
 </details>
 
 <details>
@@ -1593,6 +2137,223 @@ Use inheritance to compose interfaces and define ways to compose objects to obta
    ![Diagram](https://github.com/JoanStinson/RetroRPGPatterns/blob/main/Diagrams/Structural%20Patterns/Facade.png)
    
    > The Facade pattern establishes a new interface, whereas the Adapter pattern adapts an old interface.
+   
+   ```csharp
+   public class ClientFacade : MonoBehaviour
+   {
+       private BikeEngine _bikeEngine;
+
+       private void Awake()
+       {
+           _bikeEngine = gameObject.AddComponent<BikeEngine>();
+       }
+
+       private void OnGUI()
+       {
+           if (GUILayout.Button("Turn On"))
+           {
+               _bikeEngine.TurnOn();
+           }
+
+           if (GUILayout.Button("Turn Off"))
+           {
+               _bikeEngine.TurnOff();
+           }
+
+           if (GUILayout.Button("Toggle Turbo"))
+           {
+               _bikeEngine.ToggleTurbo();
+           }
+       }
+   }
+   ```
+   ```csharp
+   public class BikeEngine : MonoBehaviour
+   {
+       public float burnRate = 1f;
+       public float fuelAmount = 100f;
+       public float tempRate = 5f;
+       public float minTemp = 50f;
+       public float maxTemp = 65f;
+       public float currentTemp;
+       public float turboDuration = 2f;
+
+       private FuelPump _fuelPump;
+       private TurboCharger _turboCharger;
+       private CoolingSystem _coolingSystem;
+       private bool _isEngineOn;
+
+       private void Awake()
+       {
+           _fuelPump = gameObject.AddComponent<FuelPump>();
+           _turboCharger = gameObject.AddComponent<TurboCharger>();
+           _coolingSystem = gameObject.AddComponent<CoolingSystem>();
+       }
+
+       private void Start()
+       {
+           _fuelPump.engine = this;
+           _turboCharger.engine = this;
+           _coolingSystem.engine = this;
+       }
+
+       public void TurnOn()
+       {
+           _isEngineOn = true;
+           StartCoroutine(_fuelPump.burnFuel);
+           StartCoroutine(_coolingSystem.coolEngine);
+       }
+
+       public void TurnOff()
+       {
+           _isEngineOn = false;
+           _coolingSystem.ResetTemperature();
+           StopCoroutine(_fuelPump.burnFuel);
+           StopCoroutine(_coolingSystem.coolEngine);
+       }
+
+       public void ToggleTurbo()
+       {
+           if (_isEngineOn)
+           {
+               _turboCharger.ToggleTurbo(_coolingSystem);
+           }
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(100, 0, 500, 20), "Engine Running: " + _isEngineOn);
+       }
+   }
+   ```
+   ```csharp
+   public class FuelPump : MonoBehaviour
+   {
+       public BikeEngine engine;
+       public IEnumerator burnFuel;
+
+       private void Awake()
+       {
+           burnFuel = BurnFuel();
+       }
+
+       private IEnumerator BurnFuel()
+       {
+           while (true)
+           {
+               yield return new WaitForSeconds(1);
+               engine.fuelAmount -= engine.burnRate;
+
+               if (engine.fuelAmount <= 0.0f)
+               {
+                   engine.TurnOff();
+                   yield return 0;
+               }
+           }
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(100, 40, 500, 20), "Fuel: " + engine.fuelAmount);
+       }
+   }
+   ```
+   ```csharp
+   public class TurboCharger : MonoBehaviour
+   {
+       public BikeEngine engine;
+
+       private bool _isTurboOn;
+       private CoolingSystem _coolingSystem;
+
+       public void ToggleTurbo(CoolingSystem coolingSystem)
+       {
+           _coolingSystem = coolingSystem;
+           if (!_isTurboOn)
+           {
+               StartCoroutine(TurboCharge());
+           }
+       }
+
+       private IEnumerator TurboCharge()
+       {
+           _isTurboOn = true;
+           _coolingSystem.PauseCooling();
+
+           yield return new WaitForSeconds(engine.turboDuration);
+
+           _isTurboOn = false;
+           _coolingSystem.PauseCooling();
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(100, 60, 500, 20), "Turbo Activated: " + _isTurboOn);
+       }
+   }
+   ```
+   ```csharp
+   public class CoolingSystem : MonoBehaviour
+   {
+
+       public BikeEngine engine;
+       public IEnumerator coolEngine;
+       private bool _isPaused;
+
+       private void Awake()
+       {
+           coolEngine = CoolEngine();
+       }
+
+       public void PauseCooling()
+       {
+           _isPaused = !_isPaused;
+       }
+
+       public void ResetTemperature()
+       {
+           engine.currentTemp = 0.0f;
+       }
+
+       private IEnumerator CoolEngine()
+       {
+           while (true)
+           {
+               yield return new WaitForSeconds(1);
+
+               if (!_isPaused)
+               {
+                   if (engine.currentTemp > engine.minTemp)
+                   {
+                       engine.currentTemp -= engine.tempRate;
+                   }
+                   else if (engine.currentTemp < engine.minTemp)
+                   {
+                       engine.currentTemp += engine.tempRate;
+                   }
+               }
+               else
+               {
+                   engine.currentTemp += engine.tempRate;
+               }
+
+               if (engine.currentTemp > engine.maxTemp)
+               {
+                   engine.TurnOff();
+               }
+           }
+       }
+
+       private void OnGUI()
+       {
+           GUI.color = Color.green;
+           GUI.Label(new Rect(100, 20, 500, 20), "Temp: " + engine.currentTemp);
+       }
+   }
+   ```
 </details>
 
 <details>
