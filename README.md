@@ -1,5 +1,5 @@
 # Retro RPG Patterns
-A tiny retro action RPG implementation made applying Software Design Patterns to serve as a guide of reusable solutions that can be applied to common problems.
+A tiny retro action RPG implementation made applying Software Design Patterns to serve as a guide of reusable solutions that can be applied to common problems..
 
 <p align="center">
   <a>
