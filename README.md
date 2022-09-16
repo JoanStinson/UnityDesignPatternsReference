@@ -1,6 +1,27 @@
 # Retro RPG Patterns
 A tiny retro action RPG implementation made applying Software Design Patterns to serve as a guide of reusable solutions that can be applied to common problems.
 
+<p align="center">
+  <a>
+    <img alt="Made With Unity" src="https://img.shields.io/badge/made%20with-Unity-57b9d3.svg?logo=Unity">
+  </a>
+  <a>
+    <img alt="License" src="https://img.shields.io/github/license/JoanStinson/RetroRPGPatterns?logo=github">
+  </a>
+  <a>
+    <img alt="Last Commit" src="https://img.shields.io/github/last-commit/JoanStinson/RetroRPGPatterns?logo=Mapbox&color=orange">
+  </a>
+  <a>
+    <img alt="Repo Size" src="https://img.shields.io/github/repo-size/JoanStinson/RetroRPGPatterns?logo=VirtualBox">
+  </a>
+  <a>
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/JoanStinson/RetroRPGPatterns/total?color=brightgreen">
+  </a>
+  <a>
+    <img alt="Last Release" src="https://img.shields.io/github/v/release/JoanStinson/RetroRPGPatterns?include_prereleases&logo=Dropbox&color=yellow">
+  </a>
+</p>
+
 * **🔊 Behavioral Patterns**
     * Define a concrete communication scheme between objects.
 * **🐣 Creational Patterns**
