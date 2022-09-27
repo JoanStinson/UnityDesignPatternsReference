@@ -23,7 +23,7 @@ A tiny retro action RPG implementation made applying Software Design Patterns to
 </p>
 
 * **🔊 Behavioral Patterns**
-    * Define a concrete communication scheme between objects..
+    * Define a concrete communication scheme between objects.
 * **🐣 Creational Patterns**
     * Create objects, rather than instantiating them directly.
 * **✂️ Decoupling Patterns**
